@@ -1,5112 +1,1437 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#2563eb">
-<meta name="description" content="Gestão de inventário e stock de joias - Portugal">
-<title>StockPT — Gestão de Joias</title>
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --primary:#2563eb;
-  --primary-dark:#1d4ed8;
-  --success:#16a34a;
-  --danger:#dc2626;
-  --warning:#d97706;
-  --info:#0891b2;
-  --bg:#f5f7fb;
-  --card:#fff;
-  --text:#172033;
-  --muted:#64748b;
-  --border:#e2e8f0;
-  --sidebar:#111827;
-  --sidebar-text:#dbeafe;
-  --shadow:0 4px 18px rgba(15,23,42,.07);
-  --radius:14px;
-}
-
-html,body{width:100%;height:100%}
-body{
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
-}
-
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-
-.app{
-  min-height:100vh;
-  display:flex;
-}
-
-/* SIDEBAR */
-.sidebar{
-  width:250px;
-  background:var(--sidebar);
-  color:white;
-  position:fixed;
-  left:0;
-  top:0;
-  bottom:0;
-  z-index:100;
-  display:flex;
-  flex-direction:column;
-  transition:.25s;
-}
-
-.logo{
-  height:72px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:0 20px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.logo-icon{
-  width:40px;
-  height:40px;
-  border-radius:11px;
-  background:var(--primary);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:21px;
-}
-
-.logo strong{font-size:18px}
-.logo small{display:block;color:#94a3b8;font-size:11px;margin-top:2px}
-
-.nav{
-  padding:15px 10px;
-  flex:1;
-  overflow:auto;
-}
-
-.nav-section{
-  color:#64748b;
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:1px;
-  padding:13px 12px 7px;
-}
-
-.nav button{
-  width:100%;
-  border:0;
-  background:transparent;
-  color:#cbd5e1;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:11px 13px;
-  border-radius:9px;
-  text-align:left;
-  margin-bottom:3px;
-  transition:.15s;
-}
-
-.nav button:hover{background:#1e293b;color:white}
-.nav button.active{background:var(--primary);color:white}
-.nav-icon{
-  width:20px;
-  text-align:center;
-  font-size:17px;
-}
-
-.sidebar-bottom{
-  padding:12px;
-  border-top:1px solid rgba(255,255,255,.08);
-}
-
-.storage-status{
-  background:#1e293b;
-  padding:11px;
-  border-radius:9px;
-  font-size:12px;
-  color:#cbd5e1;
-}
-
-.storage-dot{
-  display:inline-block;
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#22c55e;
-  margin-right:6px;
-}
-
-/* MAIN */
-.main{
-  margin-left:250px;
-  width:calc(100% - 250px);
-  min-width:0;
-}
-
-.topbar{
-  height:72px;
-  background:white;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 25px;
-  position:sticky;
-  top:0;
-  z-index:50;
-}
-
-.topbar-left{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.mobile-menu{
-  display:none;
-  border:0;
-  background:none;
-  font-size:22px;
-}
-
-.page-title{
-  font-size:21px;
-  font-weight:700;
-}
-
-.top-actions{
-  display:flex;
-  align-items:center;
-  gap:9px;
-}
-
-.icon-btn{
-  width:40px;
-  height:40px;
-  border:1px solid var(--border);
-  background:white;
-  border-radius:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.content{
-  padding:25px;
-  max-width:1700px;
-  margin:auto;
-}
-
-/* BUTTONS */
-.btn{
-  border:0;
-  border-radius:9px;
-  padding:10px 15px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  font-weight:600;
-  transition:.15s;
-}
-
-.btn-primary{background:var(--primary);color:white}
-.btn-primary:hover{background:var(--primary-dark)}
-.btn-secondary{background:#f1f5f9;color:#334155}
-.btn-success{background:var(--success);color:white}
-.btn-sm{padding:7px 10px;font-size:11px;line-height:1;border-radius:7px;white-space:nowrap}
-.btn-danger{background:#dc2626;color:#fff;border:1px solid #dc2626}
-.btn-danger:hover{filter:brightness(.95)}
-
-.btn-danger{background:var(--danger);color:white}
-.btn-warning{background:#f59e0b;color:white}
-.btn-outline{background:white;border:1px solid var(--border);color:#334155}
-.btn-sm{padding:7px 10px;font-size:12px}
-.btn-block{width:100%}
-
-/* CARDS */
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:16px;
-  margin-bottom:22px;
-}
-
-.stat{
-  padding:20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.stat-info small{
-  color:var(--muted);
-  display:block;
-  font-size:12px;
-  margin-bottom:7px;
-}
-
-.stat-info strong{
-  font-size:27px;
-  display:block;
-}
-
-.stat-info span{
-  font-size:11px;
-  color:var(--muted);
-  margin-top:5px;
-  display:block;
-}
-
-.stat-icon{
-  width:48px;
-  height:48px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-}
-
-.blue{background:#dbeafe;color:#2563eb}
-.green{background:#dcfce7;color:#16a34a}
-.orange{background:#ffedd5;color:#ea580c}
-.red{background:#fee2e2;color:#dc2626}
-
-/* DASH GRID */
-.dashboard-grid{
-  display:grid;
-  grid-template-columns:1.35fr 1fr;
-  gap:18px;
-}
-
-.card-header{
-  padding:17px 19px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.card-header h3{font-size:15px}
-.card-header small{color:var(--muted)}
-
-.card-body{padding:18px}
-
-/* TABLE */
-.table-wrap{
-  overflow-x:auto;
-  width:100%;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:760px;
-}
-
-th{
-  color:#64748b;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.4px;
-  text-align:left;
-  padding:11px 13px;
-  background:#f8fafc;
-  border-bottom:1px solid var(--border);
-}
-
-td{
-  padding:12px 13px;
-  border-bottom:1px solid #eef2f7;
-  font-size:13px;
-}
-
-tr:last-child td{border-bottom:0}
-
-.product-name{
-  font-weight:600;
-}
-
-.product-code{
-  color:#64748b;
-  font-size:11px;
-  margin-top:3px;
-}
-
-.qty{
-  font-weight:700;
-}
-
-.low{color:var(--danger)}
-.ok{color:var(--success)}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  border-radius:999px;
-  padding:4px 8px;
-  font-size:10px;
-  font-weight:700;
-}
-
-.badge-green{background:#dcfce7;color:#166534}
-.badge-red{background:#fee2e2;color:#991b1b}
-.badge-orange{background:#ffedd5;color:#9a3412}
-.badge-blue{background:#dbeafe;color:#1e40af}
-.badge-gray{background:#f1f5f9;color:#475569}
-
-/* TOOLBAR */
-.toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:17px;
-  flex-wrap:wrap;
-}
-
-.search{
-  position:relative;
-  flex:1;
-  max-width:440px;
-}
-
-.search input{
-  width:100%;
-  padding:11px 13px 11px 39px;
-  border:1px solid var(--border);
-  border-radius:9px;
-  outline:none;
-  background:white;
-}
-
-.search input:focus{border-color:var(--primary)}
-
-.search-icon{
-  position:absolute;
-  left:13px;
-  top:50%;
-  transform:translateY(-50%);
-  color:#94a3b8;
-}
-
-.toolbar-right{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-/* SEARCHABLE PRODUCT FIELD */
-.searchable-select{position:relative}
-.searchable-select input{width:100%;padding:10px 38px 10px 11px;border:1px solid var(--border);border-radius:8px;outline:none;background:white;color:var(--text)}
-.searchable-select input:focus{border-color:var(--primary)}
-.searchable-select .searchable-arrow{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:#64748b;pointer-events:none}
-.searchable-options{position:absolute;left:0;right:0;top:calc(100% + 4px);background:white;border:1px solid var(--border);border-radius:9px;box-shadow:0 10px 30px rgba(15,23,42,.14);z-index:700;max-height:230px;overflow:auto;display:none}
-.searchable-options.open{display:block}
-.searchable-option{padding:10px 11px;font-size:12px;cursor:pointer;border-bottom:1px solid #f1f5f9}
-.searchable-option:last-child{border-bottom:0}
-.searchable-option:hover,.searchable-option.active{background:#eff6ff}
-.searchable-option small{display:block;color:#64748b;margin-top:3px}
-.searchable-empty{padding:11px;font-size:12px;color:#64748b}
-.movement-total-box{margin-top:12px;padding:12px 14px;background:#f8fafc;border:1px solid var(--border);border-radius:9px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.movement-total-box span{font-size:12px;color:#64748b}
- .movement-total-box strong{font-size:18px;color:var(--primary)}
-
-.stock-preview{margin-top:10px;padding:10px 12px;border-radius:9px;background:#f8fafc;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px}.stock-preview strong{font-size:15px}.stock-preview.low{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.stock-preview.critical{background:#fef2f2;border-color:#fecaca;color:#991b1b}.stock-alert-banner{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 15px;margin-bottom:18px;border:1px solid #fed7aa;background:#fff7ed;border-radius:12px;color:#9a3412}.stock-alert-banner strong{font-size:13px}.stock-alert-banner span{font-size:12px}.stock-alert-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}.stock-alert-item{background:#fff;border:1px solid #fed7aa;border-radius:999px;padding:4px 8px;font-size:10px}.movement-stock-cell{display:flex;flex-direction:column;gap:4px}.movement-stock-number{font-size:14px;font-weight:800}.movement-stock-number.low{color:var(--danger)}.movement-stock-number.ok{color:var(--success)}
-
-.movement-summary{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-
-.movement-summary-line{
-  display:flex;
-  gap:7px;
-  align-items:center;
-  flex-wrap:wrap;
-  font-size:11px;
-  color:#475569;
-}
-
-.movement-summary-total{
-  font-size:13px;
-  font-weight:700;
-  color:#0f172a;
-}
-
-.movement-actions{
-  display:flex;
-  gap:5px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-
-.movement-history-item{
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:9px;
-  background:#fff;
-}
-
-.movement-history-top{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.movement-history-info{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-
-.movement-history-meta{
-  font-size:11px;
-  color:#64748b;
-}
-
-.movement-history-actions{
-  display:flex;
-  gap:5px;
-  flex:none;
-}
-
-.movement-history-finance{font-size:11px;color:#64748b;margin-top:7px;display:flex;gap:14px;flex-wrap:wrap}
-.movement-global-totals{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px;border-top:1px solid var(--border);background:#f8fafc}
-.movement-global-total{background:white;border:1px solid var(--border);border-radius:10px;padding:11px}
-.movement-global-total span{display:block;font-size:10px;color:#64748b;margin-bottom:4px}
-.movement-global-total strong{font-size:16px}
-.sales-period-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 16px}
-.sales-period-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:15px;box-shadow:var(--shadow)}
-.sales-period-card small{display:block;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.35px;margin-bottom:6px}
-.sales-period-card strong{display:block;font-size:21px}
-.sales-period-card span{display:block;margin-top:4px;color:#64748b;font-size:11px}
-@media(max-width:760px){.movement-global-totals{grid-template-columns:1fr 1fr}.sales-period-grid{grid-template-columns:1fr}}
-
-.location-filter-input{min-width:160px}
-.settings-select{min-width:220px;max-width:280px}
-
-.movement-history-value{
-  margin-top:9px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  padding-top:9px;
-  border-top:1px solid #eef2f7;
-  font-size:12px;
-}
-
-.movement-history-empty{
-  padding:30px 15px;
-  text-align:center;
-  color:#64748b;
-}
-
-
-/* FORMS */
-.form-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-}
-
-.form-group{margin-bottom:2px}
-.form-group.full{grid-column:1/-1}
-
-.form-group label{
-  display:block;
-  font-size:12px;
-  font-weight:600;
-  color:#475569;
-  margin-bottom:6px;
-}
-
-.form-control{
-  width:100%;
-  padding:10px 11px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  outline:none;
-  background:white;
-  color:var(--text);
-}
-
-.form-control:focus{border-color:var(--primary)}
-
-textarea.form-control{
-  min-height:80px;
-  resize:vertical;
-}
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(15,23,42,.55);
-  z-index:500;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-
-.modal-box{
-  width:100%;
-  max-width:650px;
-  max-height:92vh;
-  overflow:auto;
-  background:white;
-  border-radius:16px;
-  box-shadow:0 20px 70px rgba(0,0,0,.25);
-}
-
-.modal-header{
-  padding:17px 20px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.modal-header h3{font-size:17px}
-
-.modal-close{
-  width:34px;
-  height:34px;
-  border:0;
-  background:#f1f5f9;
-  border-radius:8px;
-}
-
-.modal-body{padding:20px}
-
-.modal-footer{
-  padding:15px 20px;
-  border-top:1px solid var(--border);
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-}
-
-/* ACTIONS */
-.actions{
-  display:flex;
-  gap:5px;
-}
-
-.action{
-  width:31px;
-  height:31px;
-  border:1px solid var(--border);
-  background:white;
-  border-radius:7px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:13px;
-}
-
-.action:hover{background:#f8fafc}
-
-/* EMPTY */
-.empty{
-  text-align:center;
-  padding:45px 20px;
-  color:var(--muted);
-}
-
-.empty-icon{font-size:40px;margin-bottom:10px}
-.empty strong{display:block;color:#334155;margin-bottom:5px}
-
-/* ACTIVITY */
-.activity{
-  display:flex;
-  gap:11px;
-  padding:11px 0;
-  border-bottom:1px solid #eef2f7;
-}
-
-.activity:last-child{border:0}
-
-.activity-icon{
-  width:33px;
-  height:33px;
-  border-radius:8px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex:none;
-}
-
-.activity-info{min-width:0}
-.activity-info strong{font-size:12px;display:block}
-.activity-info span{font-size:11px;color:var(--muted)}
-.activity-qty{margin-left:auto;font-weight:700;font-size:12px}
-
-/* PROGRESS */
-.progress{
-  height:8px;
-  background:#e2e8f0;
-  border-radius:99px;
-  overflow:hidden;
-  margin-top:8px;
-}
-
-.progress-bar{
-  height:100%;
-  border-radius:99px;
-  background:var(--primary);
-}
-
-/* LOCATION CARDS */
-.location-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:15px;
-}
-
-.location-card{padding:18px}
-.location-card h3{font-size:15px;margin-bottom:5px}
-.location-card p{font-size:12px;color:var(--muted)}
-.location-meta{
-  display:flex;
-  justify-content:space-between;
-  margin-top:15px;
-  font-size:12px;
-}
-
-/* INVENTORY */
-.inventory-list{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-}
-
-.inventory-card{padding:17px}
-.inventory-card h3{font-size:15px}
-.inventory-card p{font-size:12px;color:var(--muted);margin-top:4px}
-.inventory-card-bottom{
-  margin-top:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-/* SETTINGS */
-.settings-grid{
-  display:grid;
-  grid-template-columns:250px 1fr;
-  gap:17px;
-}
-
-.settings-menu button{
-  width:100%;
-  padding:11px 13px;
-  text-align:left;
-  background:white;
-  border:0;
-  border-bottom:1px solid #f1f5f9;
-}
-
-.settings-menu button.active{
-  color:var(--primary);
-  font-weight:700;
-  background:#eff6ff;
-}
-
-.setting-row{
-  padding:16px 0;
-  border-bottom:1px solid #eef2f7;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-}
-
-.setting-row:last-child{border:0}
-.setting-row strong{display:block;font-size:13px}
-.setting-row p{font-size:11px;color:var(--muted);margin-top:4px}
-
-.switch{
-  width:42px;
-  height:24px;
-  background:#cbd5e1;
-  border-radius:99px;
-  position:relative;
-  border:0;
-  flex:none;
-}
-
-.switch.on{background:var(--primary)}
-.switch:after{
-  content:"";
-  position:absolute;
-  width:18px;
-  height:18px;
-  background:white;
-  border-radius:50%;
-  top:3px;
-  left:3px;
-  transition:.2s;
-  box-shadow:0 1px 3px rgba(0,0,0,.2);
-}
-
-.switch.on:after{left:21px}
-
-/* TOAST */
-.toast-container{
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  z-index:1000;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.toast{
-  min-width:270px;
-  max-width:380px;
-  padding:13px 15px;
-  border-radius:10px;
-  color:white;
-  background:#1e293b;
-  box-shadow:0 8px 30px rgba(0,0,0,.18);
-  font-size:12px;
-  animation:toastIn .2s ease;
-}
-
-.toast.success{background:#15803d}
-.toast.error{background:#b91c1c}
-.toast.warning{background:#b45309}
-
-@keyframes toastIn{
-  from{transform:translateY(10px);opacity:0}
-  to{transform:translateY(0);opacity:1}
-}
-
-/* SCANNER */
-
-.scan-frame{
-  position:absolute;
-  width:230px;
-  height:150px;
-  border:2px solid #22c55e;
-  border-radius:10px;
-  box-shadow:0 0 0 999px rgba(0,0,0,.25);
-}
-
-.scan-line{
-  position:absolute;
-  width:220px;
-  height:2px;
-  background:#22c55e;
-  animation:scan 1.8s infinite;
-}
-
-@keyframes scan{
-  0%,100%{transform:translateY(-65px)}
-  50%{transform:translateY(65px)}
-}
-
-/* FILTERS */
-.filters{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.filters select{
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:9px 10px;
-  background:white;
-  font-size:12px;
-}
-
-/* PRODUCT PHOTOS */
-.photo-upload{
-  position:relative;
-  min-height:190px;
-  border:2px dashed var(--border);
-  border-radius:12px;
-  background:#f8fafc;
-  overflow:hidden;
-}
-.photo-placeholder{
-  min-height:186px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  color:var(--muted);
-  cursor:pointer;
-}
-.photo-placeholder span{font-size:38px}
-.photo-placeholder strong{font-size:13px;color:#334155}
-.photo-placeholder small{font-size:11px}
-.photo-preview{
-  display:block;
-  width:100%;
-  height:240px;
-  object-fit:contain;
-  background:#f8fafc;
-}
-.photo-remove{
-  position:absolute;
-  top:9px;
-  right:9px;
-  width:32px;
-  height:32px;
-  border:0;
-  border-radius:50%;
-  background:rgba(15,23,42,.75);
-  color:white;
-}
-.product-cell{display:flex;align-items:center;gap:10px;min-width:180px}
-.product-thumb{width:46px;height:46px;border-radius:8px;object-fit:cover;background:#f1f5f9;flex:none}
-.product-thumb.placeholder{display:flex;align-items:center;justify-content:center;font-size:21px}
-
-/* RESPONSIVE */
-@media(max-width:1000px){
-  .stats{grid-template-columns:repeat(3,1fr)}
-  .dashboard-grid{grid-template-columns:1fr}
-  .location-grid{grid-template-columns:repeat(2,1fr)}
-}
-
-@media(max-width:760px){
-  .sidebar{
-    transform:translateX(-100%);
-    box-shadow:10px 0 30px rgba(0,0,0,.2);
-  }
-  .sidebar.open{transform:translateX(0)}
-  .main{
-    margin-left:0;
-    width:100%;
-  }
-  .mobile-menu{display:block}
-  .content{padding:15px}
-  .topbar{padding:0 15px}
-  .page-title{font-size:17px}
-  .top-actions .hide-mobile{display:none}
-  .stats{gap:10px}
-  .stat{padding:14px}
-  .stat-info strong{font-size:21px}
-  .stat-icon{width:39px;height:39px;font-size:18px}
-  .form-grid{grid-template-columns:1fr}
-  .form-group.full{grid-column:auto}
-  .location-grid,.inventory-list{grid-template-columns:1fr}
-  .settings-grid{grid-template-columns:1fr}
-  .toolbar{align-items:stretch}
-  .search{max-width:none;min-width:100%}
-  .toolbar-right{width:100%}
-  .toolbar-right .btn{flex:1}
-}
-
-@media(max-width:430px){
-  .stats{grid-template-columns:1fr 1fr}
-  .stat{display:block}
-  .stat-icon{margin-top:10px}
-}
-
-/* OVERLAY MOBILE */
-.mobile-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  z-index:90;
-}
-
-.mobile-overlay.show{display:block}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards Educativos - Aprende Conmigo</title>
+  <style>
+    :root {
+      --bg-color: #f1f5f9;
+      --card-front: #10b981;
+      --card-back: #059669;
+      --text-color: #ffffff;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #1e293b;
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    .info-text {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 20px;
+      max-width: 1000px;
+    }
+
+    .tab-btn {
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 20px;
+      background-color: #e2e8f0;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn.active {
+      background-color: var(--card-front);
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+    }
+
+    .tab-btn.lixeira {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .tab-btn.lixeira.active {
+      background-color: #dc2626;
+      box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-delete-cat {
+      background: rgba(239, 68, 68, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .btn-delete-cat:hover {
+      background: rgba(220, 38, 38, 1);
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 1000px;
+      padding-bottom: 30px;
+    }
+
+    .grid-container.grid-custom-container {
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .card {
+      background-color: transparent;
+      height: 140px;
+      perspective: 1000px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .card.card-large {
+      height: 165px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+      transform-style: preserve-3d;
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 6px;
+      box-sizing: border-box;
+      color: var(--text-color);
+    }
+
+    .card-front {
+      background-color: var(--card-front);
+    }
+
+    .card-front .main-title {
+      font-size: 19px;
+      font-weight: bold;
+      word-break: normal;
+      overflow-wrap: normal;
+      hyphens: none;
+      line-height: 1.15;
+      padding: 0 2px;
+    }
+
+    .card-front .visual-front {
+      font-size: 42px;
+    }
+
+    .card-back {
+      background-color: var(--card-back);
+      transform: rotateY(180deg);
+    }
+
+    .card-back .visual {
+      font-size: 32px;
+      margin-bottom: 4px;
+    }
+
+    .card-back .es-text {
+      font-size: 14px;
+      font-weight: bold;
+      word-break: break-word;
+      margin-top: 4px;
+    }
+
+    .btn-delete-card {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: transparent;
+      color: #000000;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+
+    .btn-delete-card:hover {
+      color: #ff0000;
+      transform: scale(1.2);
+    }
+
+    .btn-restore-card {
+      position: absolute;
+      top: 5px;
+      right: 30px;
+      background: transparent;
+      color: #059669;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+
+    .btn-restore-card:hover {
+      color: #10b981;
+      transform: scale(1.2);
+    }
+
+    .btn-delete-permanent {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: transparent;
+      color: #ff0000;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+
+    .btn-delete-permanent:hover {
+      color: #cc0000;
+      transform: scale(1.2);
+    }
+
+    .photo-btn-placeholder-large {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px dashed #ffffff;
+      border-radius: 10px;
+      width: 75px;
+      height: 75px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      color: #ffffff;
+      font-weight: bold;
+      transition: background 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .photo-btn-placeholder-large:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-foto-pill {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: #0d9488;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      z-index: 10;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .btn-foto-pill:hover {
+      background: #0f766e;
+    }
+
+    .card-img-large {
+      width: 75px !important;
+      height: 75px !important;
+      object-fit: cover !important;
+      border-radius: 10px !important;
+      border: 2px solid #ffffff !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+      max-width: 75px !important;
+      max-height: 75px !important;
+    }
+
+    .custom-panel {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
+      width: 100%;
+      max-width: 1000px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .custom-form {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .custom-form input[type="text"] {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 14px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .custom-form input[type="text"]:focus {
+      border-color: var(--card-front);
+    }
+
+    .btn-add {
+      background-color: var(--card-front);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      display: flex;
+      gap: 4px;
+      z-index: 10;
+    }
+
+    .btn-action {
+      background: rgba(0, 0, 0, 0.4);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-action:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .menu-destinos {
+      position: absolute;
+      top: 32px;
+      right: 5px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      max-height: 140px;
+      overflow-y: auto;
+      min-width: 140px;
+    }
+
+    .menu-destinos button {
+      background: white;
+      color: #333;
+      border: none;
+      padding: 6px 12px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      white-space: nowrap;
+    }
+
+    .menu-destinos button:hover {
+      background: #f1f5f9;
+    }
+
+    .lixeira-vazia {
+      text-align: center;
+      color: #64748b;
+      font-size: 18px;
+      padding: 40px 20px;
+      width: 100%;
+      grid-column: 1 / -1;
+    }
+
+    /* ===== SPLASH SCREEN ===== */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #059669 0%, #10b981 45%, #34d399 100%);
+      overflow: hidden;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    #splash-screen.splash-hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-blob {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      filter: blur(2px);
+    }
+
+    .splash-blob-1 { width: 220px; height: 220px; top: -60px; left: -60px; animation: splashFloat 7s ease-in-out infinite; }
+    .splash-blob-2 { width: 160px; height: 160px; bottom: -40px; right: -40px; animation: splashFloat 8s ease-in-out infinite reverse; }
+    .splash-blob-3 { width: 90px; height: 90px; top: 20%; right: 12%; animation: splashFloat 5.5s ease-in-out infinite; }
+
+    @keyframes splashFloat {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-22px) translateX(14px); }
+    }
+
+    .splash-emoji-row {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .splash-emoji-row span {
+      font-size: 34px;
+      display: inline-block;
+      animation: splashBounce 1.6s ease-in-out infinite;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+    }
+
+    .splash-emoji-row span:nth-child(2) { animation-delay: 0.15s; }
+    .splash-emoji-row span:nth-child(3) { animation-delay: 0.3s; }
+    .splash-emoji-row span:nth-child(4) { animation-delay: 0.45s; }
+    .splash-emoji-row span:nth-child(5) { animation-delay: 0.6s; }
+
+    @keyframes splashBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-14px) rotate(-6deg); }
+    }
+
+    .splash-icon {
+      width: 110px;
+      height: 110px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+      margin-bottom: 22px;
+      animation: splashPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both, splashIconFloat 3s ease-in-out 0.7s infinite;
+    }
+
+    @keyframes splashPop {
+      0% { transform: scale(0) rotate(-25deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    @keyframes splashIconFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .splash-title {
+      color: #ffffff;
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      margin: 0;
+      opacity: 0;
+      animation: splashFadeUp 0.7s ease 0.25s forwards;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .splash-subtitle {
+      color: rgba(255,255,255,0.92);
+      font-size: 15px;
+      margin: 8px 0 34px 0;
+      opacity: 0;
+      animation: splashFadeUp 0.7s ease 0.4s forwards;
+      text-align: center;
+      padding: 0 30px;
+    }
+
+    @keyframes splashFadeUp {
+      0% { opacity: 0; transform: translateY(14px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .splash-enter-btn {
+      background: #ffffff;
+      color: #059669;
+      border: none;
+      padding: 15px 38px;
+      border-radius: 30px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      opacity: 0;
+      animation: splashFadeUp 0.7s ease 0.55s forwards, splashPulse 2s ease-in-out 1.4s infinite;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .splash-enter-btn:active {
+      transform: scale(0.96);
+    }
+
+    @keyframes splashPulse {
+      0%, 100% { box-shadow: 0 10px 25px rgba(0,0,0,0.2), 0 0 0 0 rgba(255,255,255,0.5); }
+      50% { box-shadow: 0 10px 25px rgba(0,0,0,0.2), 0 0 0 12px rgba(255,255,255,0); }
+    }
+
+    .splash-dots {
+      position: absolute;
+      bottom: 26px;
+      display: flex;
+      gap: 6px;
+      opacity: 0;
+      animation: splashFadeUp 0.7s ease 0.7s forwards;
+    }
+
+    .splash-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      animation: splashDotBlink 1.4s ease-in-out infinite;
+    }
+
+    .splash-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .splash-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes splashDotBlink {
+      0%, 100% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="app">
+  <div id="splash-screen">
+    <div class="splash-blob splash-blob-1"></div>
+    <div class="splash-blob splash-blob-2"></div>
+    <div class="splash-blob splash-blob-3"></div>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+    <div class="splash-emoji-row">
+      <span>🅰️</span><span>🐱</span><span>🍎</span><span>🚗</span><span>🎨</span>
+    </div>
 
-    <div class="logo">
-      <div class="logo-icon">📦</div>
-      <div>
-        <strong>StockPT</strong>
-        <small>Gestão de Joias</small>
+    <div class="splash-icon">🐸</div>
+    <h1 class="splash-title">Aprende Conmigo</h1>
+    <p class="splash-subtitle">Flashcards divertidos para aprender Espanhol!</p>
+
+    <button class="splash-enter-btn" onclick="entrarNoApp()">🚀 Começar</button>
+
+    <div class="splash-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <h1>Aprende Conmigo</h1>
+  <p class="info-text">Toca no card para virar e ouvir em Espanhol!</p>
+
+  <div class="tabs" id="tabs-container"></div>
+
+  <div id="grids-wrapper" style="width: 100%; max-width: 1000px;"></div>
+
+  <!-- ABA PERSONALIZADA -->
+  <div id="container-custom" class="hidden" style="width: 100%; max-width: 1000px;">
+    <div class="custom-panel">
+      <div class="custom-form">
+        <input type="text" id="custom-input-name" placeholder="Nome em Português..." />
+        <button class="btn-add" onclick="addCustomCard()">Criar Card</button>
+      </div>
+      <div class="custom-form">
+        <input type="text" id="custom-cat-name" placeholder="Nome do novo Catálogo..." />
+        <button class="btn-add" style="background-color: #3b82f6;" onclick="criarNovaCategoria()">Criar Catálogo</button>
       </div>
     </div>
-    <!-- Cole o código do botão onde deseja que ele apareça -->
-<div style="text-align: center; margin: 20px 0;">
-  <a href="https://otonieljosias62-collab.github.io/Meu-app/6a7e36d8b83898569a66a907.apk" download>
-    <button style="padding: 14px 28px; background-color: #2563eb; color: #ffffff; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-      📲 Baixar App para Android (.APK)
-    </button>
-  </a>
-</div>
+    <div id="grid-custom" class="grid-container grid-custom-container"></div>
+  </div>
+
+  <script>
+    let categoriasCustomizadas = JSON.parse(localStorage.getItem('cat_customizadas') || '[]');
+    let customCards = JSON.parse(localStorage.getItem('custom_flashcards') || '[]');
+    let lixeira = JSON.parse(localStorage.getItem('lixeira_flashcards') || '[]');
+    let currentActiveTab = 'alfabeto';
+
+    const alfabeto = [
+      { es: "A", visual: "🅰️" }, { es: "Be", visual: "🐝" }, { es: "Ce", visual: "🏠" },
+      { es: "De", visual: "🎲" }, { es: "E", visual: "🐘" }, { es: "Efe", visual: "🔥" },
+      { es: "Ge", visual: "🐱" }, { es: "Hache", visual: "🍦" }, { es: "I", visual: "🏝️" },
+      { es: "Jota", visual: "🦒" }, { es: "Ka", visual: "🐨" }, { es: "Ele", visual: "🦁" },
+      { es: "Eme", visual: "🍎" }, { es: "Ene", visual: "☁️" }, { es: "Eñe", visual: "🪅" },
+      { es: "O", visual: "🐻" }, { es: "Pe", visual: "🐧" }, { es: "Cu", visual: "🧀" },
+      { es: "Ere", visual: "🤖" }, { es: "Ese", visual: "🐍" }, { es: "Te", visual: "🐯" },
+      { es: "U", visual: "🍇" }, { es: "Uve", visual: "🐄" }, { es: "Uve doble", visual: "🪟" },
+      { es: "Equis", visual: "🎷" }, { es: "I griega", visual: "🪀" }, { es: "Ceta", visual: "🦊" }
+    ].map((item, idx) => ({ ...item, ptMain: String.fromCharCode(65 + (idx > 14 ? idx - 1 : idx)) }));
+    alfabeto[14].ptMain = "Ñ";
+
+    const numEspeciaisES = { 
+      1: "uno", 2: "dos", 3: "tres", 4: "cuatro", 5: "cinco", 6: "seis", 7: "siete", 8: "ocho", 9: "nueve",
+      10: "diez", 11: "once", 12: "doce", 13: "trece", 14: "catorce", 15: "quince", 
+      16: "dieciséis", 17: "diecisiete", 18: "dieciocho", 19: "diecinueve", 20: "veinte", 
+      21: "veintiuno", 22: "veintidós", 23: "veintitrés", 24: "veinticuatro", 25: "veinticinco",
+      26: "veintiséis", 27: "veintisiete", 28: "veintiocho", 29: "veintinueve",
+      30: "treinta", 40: "cuarenta", 50: "cincuenta", 60: "sesenta", 70: "setenta",
+      80: "ochenta", 90: "noventa", 100: "cien", 200: "doscientos", 300: "trescientos",
+      400: "cuatrocientos", 500: "quinientos", 600: "seiscientos", 700: "setecientos",
+      800: "ochocientos", 900: "novecientos", 
+      1000: "mil", 2000: "dos mil", 10000: "diez mil", 100000: "cien mil", 1000000: "un millón"
+    };
     
-
-    <nav class="nav">
-
-      <div class="nav-section">Principal</div>
-
-      <button class="active" data-page="dashboard">
-        <span class="nav-icon">📊</span>
-        Dashboard
-      </button>
-
-      <button data-page="products">
-        <span class="nav-icon">💎</span>
-        Joias
-      </button>
-
-      <button data-page="movements">
-        <span class="nav-icon">🔄</span>
-        Movimentos
-      </button>
-
-      <button data-page="inventories">
-        <span class="nav-icon">📋</span>
-        Inventários
-      </button>
-
-      <div class="nav-section">Organização</div>
-
-      <button data-page="locations">
-        <span class="nav-icon">🏭</span>
-        Localizações
-      </button>
-
-      <button data-page="categories">
-        <span class="nav-icon">🏷️</span>
-        Categorias
-      </button>
-
-      <div class="nav-section">Sistema</div>
-
-      <button data-page="import">
-        <span class="nav-icon">↕️</span>
-        Importar / Exportar
-      </button>
-
-      <button data-page="settings">
-        <span class="nav-icon">⚙️</span>
-        Definições
-      </button>
-
-    </nav>
-
-    <div class="sidebar-bottom">
-      <div class="storage-status">
-        <span class="storage-dot"></span>
-        Dados guardados neste dispositivo
-      </div>
-    </div>
-
-  </aside>
-
-  <div class="mobile-overlay" id="mobileOverlay"></div>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <header class="topbar">
-
-      <div class="topbar-left">
-        <button class="mobile-menu" id="mobileMenu">☰</button>
-        <div class="page-title" id="pageTitle">Dashboard</div>
-      </div>
-
-      <div class="top-actions">
-
-        <button id="topNewJewelryButton" class="btn btn-primary hide-mobile" onclick="openProductModal()">
-          ＋ Nova joia
-        </button>
-
-      </div>
-
-    </header>
-
-    <div class="content">
-
-      <!-- DASHBOARD -->
-      <section id="page-dashboard" class="page">
-
-        <div class="stats">
-
-          <div class="card stat">
-            <div class="stat-info">
-              <small>Total de joias</small>
-              <strong id="statProducts">0</strong>
-              <span>Joias registadas</span>
-            </div>
-            <div class="stat-icon blue">📦</div>
-          </div>
-
-          <div class="card stat">
-            <div class="stat-info">
-              <small>Quantidade em stock</small>
-              <strong id="statQuantity">0</strong>
-              <span>Unidades em stock</span>
-            </div>
-            <div class="stat-icon green">📊</div>
-          </div>
-
-          <div class="card stat">
-            <div class="stat-info">
-              <small>Stock baixo</small>
-              <strong id="statLow">0</strong>
-              <span>Artigos a repor</span>
-            </div>
-            <div class="stat-icon orange">⚠️</div>
-          </div>
-
-          <div class="card stat">
-            <div class="stat-info">
-              <small>Valor do stock</small>
-              <strong id="statValue">0,00 €</strong>
-              <span>Valor estimado ao custo</span>
-            </div>
-            <div class="stat-icon red">€</div>
-          </div>
-
-          <div class="card stat">
-            <div class="stat-info">
-              <small>Lucro</small>
-              <strong id="statProfit">0,00 €</strong>
-              <span>Lucro realizado nas vendas</span>
-            </div>
-            <div class="stat-icon green">+€</div>
-          </div>
-
-        </div>
-
-        <div id="lowStockAlertBanner"></div>
-
-        <div class="dashboard-grid">
-
-          <div class="card">
-
-            <div class="card-header">
-              <h3>Joias com stock baixo</h3>
-              <button class="btn btn-secondary btn-sm" onclick="navigate('products')">
-                Ver todos
-              </button>
-            </div>
-
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Artigo</th>
-                    <th>Localização</th>
-                    <th>Stock</th>
-                    <th>Mínimo</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody id="lowStockTable"></tbody>
-              </table>
-            </div>
-
-          </div>
-
-          <div class="card">
-
-            <div class="card-header">
-              <h3>Movimentos recentes</h3>
-              <button class="btn btn-secondary btn-sm" onclick="navigate('movements')">
-                Ver histórico
-              </button>
-            </div>
-
-            <div class="card-body" id="recentActivity"></div>
-
-          </div>
-
-        </div>
-
-        <div style="height:18px"></div>
-
-        <div class="dashboard-grid">
-
-          <div class="card">
-
-            <div class="card-header">
-              <h3>Stock por localização</h3>
-            </div>
-
-            <div class="card-body" id="locationStats"></div>
-
-          </div>
-
-          <div class="card">
-
-            <div class="card-header">
-              <h3>Categorias</h3>
-            </div>
-
-            <div class="card-body" id="categoryStats"></div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- PRODUCTS -->
-      <section id="page-products" class="page hidden">
-
-        <div class="toolbar">
-
-          <div class="search">
-            <span class="search-icon">🔎</span>
-            <input
-              id="productSearch"
-              type="search"
-              placeholder="Pesquisar joias..."
-            >
-          </div>
-
-          <div class="toolbar-right">
-
-            <input class="filters location-filter-input" id="productLocationFilter" type="search" placeholder="Localização...">
-
-            <button class="btn btn-primary" onclick="openProductModal()">
-              ＋ Nova joia
-            </button>
-
-          </div>
-
-        </div>
-
-        <div class="sales-period-grid" id="movementSalesPeriods"></div>
-
-        <div class="card">
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Artigo</th>
-                  <th>Localização</th>
-                  <th>Stock</th>
-                  <th>Preço</th>
-                  <th>Estado</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-
-              <tbody id="productsTable"></tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- MOVEMENTS -->
-      <section id="page-movements" class="page hidden">
-
-        <div class="toolbar">
-
-          <div class="search">
-            <span class="search-icon">🔎</span>
-            <input
-              id="movementSearch"
-              type="search"
-              placeholder="Pesquisar movimentos..."
-            >
-          </div>
-
-          <div class="toolbar-right">
-
-            <button class="btn btn-success" onclick="openMovementModal('entrada')">
-              ＋ Entrada
-            </button>
-
-            <button class="btn btn-danger" onclick="openMovementModal('saida')">
-              − Saída
-            </button>
-
-            <select id="movementTypeFilter">
-              <option value="">Todos os movimentos</option>
-              <option value="entrada">Entradas</option>
-              <option value="saida">Saídas</option>
-              <option value="ajuste">Ajustes</option>
-              <option value="transferencia">Transferências</option>
-              <option value="inventario">Inventários</option>
-            </select>
-
-          </div>
-
-        </div>
-
-        <div class="card">
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Último movimento</th>
-                  <th>Tipo</th>
-                  <th>Artigo</th>
-                  <th>Quantidade</th>
-                  <th>Stock atual</th>
-                  <th>Categoria</th>
-                  <th>Valor total</th>
-                  <th>Localização</th>
-                  <th>Utilizador</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-
-              <tbody id="movementsTable"></tbody>
-
-            </table>
-
-          </div>
-
-          <div class="movement-global-totals" id="movementGlobalTotals"></div>
-
-        </div>
-
-      </section>
-
-
-      <!-- INVENTORIES -->
-      <section id="page-inventories" class="page hidden">
-
-        <div class="toolbar">
-
-          <div>
-            <h2 style="font-size:18px">Inventários</h2>
-            <div style="font-size:12px;color:#64748b;margin-top:3px">
-              Crie e acompanhe contagens de stock.
-            </div>
-          </div>
-
-          <div class="toolbar-right">
-            <button class="btn btn-primary" onclick="openInventoryModal()">
-              ＋ Novo inventário
-            </button>
-          </div>
-
-        </div>
-
-        <div class="inventory-list" id="inventoriesList"></div>
-
-      </section>
-
-
-      <!-- LOCATIONS -->
-      <section id="page-locations" class="page hidden">
-
-        <div class="toolbar">
-
-          <div>
-            <h2 style="font-size:18px">Localizações</h2>
-            <div style="font-size:12px;color:#64748b;margin-top:3px">
-              Consulte as localizações que foram introduzidas nos artigos.
-            </div>
-          </div>
-
-          <button class="btn btn-primary" onclick="openLocationModal()">
-            ＋ Nova localização
-          </button>
-
-        </div>
-
-        <div class="location-grid" id="locationsGrid"></div>
-
-      </section>
-
-
-      <!-- CATEGORIES -->
-      <section id="page-categories" class="page hidden">
-
-        <div class="toolbar">
-
-          <div>
-            <h2 style="font-size:18px">Categorias</h2>
-            <div style="font-size:12px;color:#64748b;margin-top:3px">
-              Organize as joias por categoria.
-            </div>
-          </div>
-
-          <button class="btn btn-primary" onclick="openCategoryModal()">
-            ＋ Nova categoria
-          </button>
-
-        </div>
-
-        <div class="card">
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Categoria</th>
-                  <th>Artigos</th>
-                  <th>Quantidade</th>
-                  <th>Valor</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-
-              <tbody id="categoriesTable"></tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- SETTINGS -->
-      <section id="page-settings" class="page hidden">
-
-        <div class="settings-grid">
-
-          <div class="card settings-menu">
-
-            <button class="active">Geral</button>
-
-          </div>
-
-          <div class="card">
-
-            <div class="card-header">
-              <h3>Definições</h3>
-            </div>
-
-            <div class="card-body">
-
-              <div class="setting-row">
-
-                <div>
-                  <strong>Guardar dados localmente</strong>
-                  <p>Os dados são guardados no armazenamento do navegador.</p>
-                </div>
-
-                <button class="switch on" id="localStorageSwitch"></button>
-
-              </div>
-
-              <div class="setting-row">
-
-                <div>
-                  <strong>Moeda</strong>
-                  <p>Escolha qualquer moeda disponível no sistema.</p>
-                </div>
-
-                <select id="settingsCurrency" class="form-control settings-select"></select>
-
-              </div>
-
-              <div class="setting-row">
-
-                <div>
-                  <strong>País / Idioma</strong>
-                  <p>Esta versão está disponível exclusivamente em Português (Portugal).</p>
-                </div>
-
-                <select id="settingsCountry" class="form-control settings-select">
-                  <option value="PT">Portugal — Português</option>
-                </select>
-
-              </div>
-
-              <div class="setting-row">
-
-                <div>
-                  <strong>Eliminar todos os dados</strong>
-                  <p>Esta operação não pode ser desfeita.</p>
-                </div>
-
-                <button class="btn btn-danger btn-sm" onclick="clearAllData()">
-                  Eliminar
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-    </div>
-
-  </main>
-
-</div>
-
-
-<!-- PRODUCT MODAL -->
-<div class="modal hidden" id="productModal">
-
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h3 id="productModalTitle">Nova joia</h3>
-      <button class="modal-close" onclick="closeModal('productModal')">✕</button>
-    </div>
-
-    <form id="productForm">
-
-      <div class="modal-body">
-
-        <input type="hidden" id="productId">
-
-        <div class="form-group full">
-          <label>Fotografia da joia</label>
-          <div class="photo-upload" id="productPhotoUpload">
-            <input id="productPhoto" type="file" accept="image/*" style="display:none">
-            <div id="productPhotoPlaceholder" class="photo-placeholder" onclick="document.getElementById('productPhoto').click()">
-              <span>📷</span>
-              <strong>Adicionar fotografia</strong>
-              <small>JPG, PNG ou WEBP</small>
-            </div>
-            <img id="productPhotoPreview" class="photo-preview" alt="Fotografia da joia">
-            <button type="button" id="removeProductPhoto" class="photo-remove hidden" onclick="removeProductPhoto(event)">✕</button>
-          </div>
-        </div>
-
-        <div class="form-grid">
-
-          <div class="form-group full">
-            <label>Nome do artigo *</label>
-            <input id="productName" class="form-control" required placeholder="Ex.: Anel solitário em ouro">
-          </div>
-
-          <div class="form-group">
-            <label>Categoria</label>
-            <div style="display:flex;gap:8px;align-items:center">
-              <select id="productCategory" class="form-control" style="flex:1">
-                <option value="">Selecione uma categoria...</option>
-              </select>
-              <button type="button" class="btn btn-secondary" title="Adicionar categoria" onclick="openCategoryModal(true)">
-                ＋
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Localização</label>
-            <input id="productLocation" class="form-control" type="text" placeholder="Digite a localização">
-          </div>
-
-          <div class="form-group">
-            <label>Quantidade</label>
-            <input id="productQuantity" class="form-control" type="number" step="0.01" min="0" value="0">
-          </div>
-
-          <div class="form-group">
-            <label>Stock mínimo</label>
-            <input id="productMin" class="form-control" type="number" step="0.01" min="0" value="2">
-          </div>
-
-          <div class="form-group">
-            <label>Preço de venda</label>
-            <input id="productPrice" class="form-control" type="number" step="0.01" min="0" value="0">
-          </div>
-
-          <div class="form-group">
-            <label>Unidade</label>
-            <select id="productUnit" class="form-control">
-              <option value="un">Unidade</option>
-              <option value="kg">Quilograma</option>
-              <option value="g">Grama</option>
-              <option value="l">Litro</option>
-              <option value="m">Metro</option>
-              <option value="cx">Caixa</option>
-              <option value="emb">Embalagem</option>
-              <option value="pal">Palete</option>
-            </select>
-          </div>
-
-          <div class="form-group full">
-            <label>Descrição</label>
-            <textarea id="productDescription" class="form-control" placeholder="Descrição opcional"></textarea>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-
-        <button type="button" class="btn btn-secondary" onclick="closeModal('productModal')">
-          Cancelar
-        </button>
-
-        <button type="submit" class="btn btn-primary">
-          Guardar joia
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- MOVEMENT MODAL -->
-<div class="modal hidden" id="movementModal">
-
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h3 id="movementModalTitle">Entrada de stock</h3>
-      <button class="modal-close" onclick="closeModal('movementModal')">✕</button>
-    </div>
-
-    <form id="movementForm">
-
-      <div class="modal-body">
-
-        <input type="hidden" id="movementType">
-        <input type="hidden" id="movementEditId">
-
-        <div class="form-grid">
-
-          <div class="form-group full">
-            <label>Artigo *</label>
-            <div class="searchable-select" id="movementProductPicker">
-              <input id="movementProductSearch" type="text" autocomplete="off" placeholder="Digite o nome da joia...">
-              <span class="searchable-arrow">▼</span>
-              <div id="movementProductOptions" class="searchable-options"></div>
-              <select id="movementProduct" class="hidden" required></select>
-            </div>
-            <div id="movementProductHint" style="font-size:11px;color:#64748b;margin-top:6px"></div>
-          </div>
-
-          <div class="form-group">
-            <label>Quantidade *</label>
-            <input id="movementQuantity" class="form-control" type="number" min="0.01" step="0.01" required>
-          </div>
-
-          <div class="form-group">
-            <label>Localização</label>
-            <input id="movementLocation" class="form-control" type="text" placeholder="Digite a localização">
-          </div>
-
-          <div class="form-group full">
-            <div id="movementStockPreview" class="stock-preview">
-              <span>Stock após este movimento</span>
-              <strong>0</strong>
-            </div>
-          </div>
-
-          <div class="form-group full">
-            <div class="movement-total-box">
-              <span>Valor total do movimento</span>
-              <strong id="movementTotalValue">0,00 €</strong>
-            </div>
-          </div>
-
-          <div class="form-group full">
-            <label>Observação</label>
-            <textarea id="movementNote" class="form-control" placeholder="Observação opcional"></textarea>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-
-        <button type="button" class="btn btn-secondary" onclick="closeModal('movementModal')">
-          Cancelar
-        </button>
-
-        <button type="submit" class="btn btn-primary">
-          Registar movimento
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- MOVEMENT HISTORY MODAL -->
-<div class="modal hidden" id="movementHistoryModal">
-
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <div>
-        <h3 id="movementHistoryTitle">Movimentos da joia</h3>
-        <div id="movementHistorySubtitle" style="font-size:11px;color:#64748b;margin-top:3px"></div>
-      </div>
-      <button class="modal-close" onclick="closeModal('movementHistoryModal')">✕</button>
-    </div>
-
-    <div class="modal-body">
-
-      <div id="movementHistoryList"></div>
-
-    </div>
-
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="closeModal('movementHistoryModal')">
-        Fechar
-      </button>
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- LOCATION MODAL -->
-<div class="modal hidden" id="locationModal">
-
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h3>Nova localização</h3>
-      <button class="modal-close" onclick="closeModal('locationModal')">✕</button>
-    </div>
-
-    <form id="locationForm">
-
-      <div class="modal-body">
-
-        <div class="form-grid">
-
-          <div class="form-group full">
-            <label>Nome *</label>
-            <input id="locationName" class="form-control" required placeholder="Ex.: Armazém principal">
-          </div>
-
-          <div class="form-group full">
-            <label>Descrição</label>
-            <textarea id="locationDescription" class="form-control"></textarea>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-
-        <button type="button" class="btn btn-secondary" onclick="closeModal('locationModal')">
-          Cancelar
-        </button>
-
-        <button class="btn btn-primary">
-          Criar localização
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- CATEGORY MODAL -->
-<div class="modal hidden" id="categoryModal">
-
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h3>Nova categoria</h3>
-      <button class="modal-close" onclick="closeModal('categoryModal')">✕</button>
-    </div>
-
-    <form id="categoryForm">
-
-      <div class="modal-body">
-
-        <div class="form-group">
-          <label>Nome *</label>
-          <input id="categoryName" class="form-control" required placeholder="Ex.: Ferramentas">
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-
-        <button type="button" class="btn btn-secondary" onclick="closeModal('categoryModal')">
-          Cancelar
-        </button>
-
-        <button class="btn btn-primary">
-          Criar categoria
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<!-- INVENTORY MODAL -->
-<div class="modal hidden" id="inventoryModal">
-
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h3>Novo inventário</h3>
-      <button class="modal-close" onclick="closeModal('inventoryModal')">✕</button>
-    </div>
-
-    <form id="inventoryForm">
-
-      <div class="modal-body">
-
-        <div class="form-grid">
-
-          <div class="form-group full">
-            <label>Nome do inventário *</label>
-            <input id="inventoryName" class="form-control" required placeholder="Ex.: Inventário Agosto 2026">
-          </div>
-
-          <div class="form-group">
-            <label>Localização</label>
-            <input id="inventoryLocation" class="form-control" type="text" placeholder="Digite a localização">
-          </div>
-
-          <div class="form-group">
-            <label>Data</label>
-            <input id="inventoryDate" class="form-control" type="date">
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-
-        <button type="button" class="btn btn-secondary" onclick="closeModal('inventoryModal')">
-          Cancelar
-        </button>
-
-        <button class="btn btn-primary">
-          Criar inventário
-        </button>
-
-      </div>
-
-    </form>
-
-  </div>
-
-</div>
-
-
-<div class="toast-container" id="toastContainer"></div>
-
-
-<script>
-"use strict";
-
-/* =========================================================
-   STOCKPT
-   Aplicação autónoma de gestão de inventário
-   ========================================================= */
-
-const STORAGE_KEY = "stockpt_data_v1";
-
-let state = {
-  products: [],
-  movements: [],
-  inventories: [],
-  locations: [],
-  categories: [],
-  settings: {
-    currency: "EUR",
-    country: "PT"
-  }
-};
-
-let currentPage = "dashboard";
-let pendingProductPhoto = "";
-
-
-/* =========================================================
-   UTILIDADES
-   ========================================================= */
-
-function uid(prefix="id"){
-  return prefix + "_" + Date.now().toString(36) + "_" +
-    Math.random().toString(36).slice(2,8);
-}
-
-function esc(value){
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-}
-
-function money(value){
-  const currency=state?.settings?.currency || "EUR";
-  return new Intl.NumberFormat(currentLocale(),{
-    style:"currency",
-    currency
-  }).format(Number(value)||0);
-}
-
-function numberPT(value){
-  return new Intl.NumberFormat(currentLocale(),{
-    maximumFractionDigits:2
-  }).format(Number(value)||0);
-}
-
-function dateTime(value){
-  const d = new Date(value);
-  if(isNaN(d)) return "";
-  return new Intl.DateTimeFormat(currentLocale(),{
-    day:"2-digit",
-    month:"2-digit",
-    year:"numeric",
-    hour:"2-digit",
-    minute:"2-digit"
-  }).format(d);
-}
-
-function dateOnly(value){
-  const d = new Date(value);
-  if(isNaN(d)) return "";
-  return new Intl.DateTimeFormat(currentLocale(),{
-    day:"2-digit",
-    month:"2-digit",
-    year:"numeric"
-  }).format(d);
-}
-
-function todayInput(){
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,"0");
-  const day = String(d.getDate()).padStart(2,"0");
-  return `${y}-${m}-${day}`;
-}
-
-function toast(message,type=""){
-  const container = document.getElementById("toastContainer");
-  const el = document.createElement("div");
-  el.className = "toast " + type;
-  el.textContent = message;
-  container.appendChild(el);
-
-  setTimeout(()=>{
-    el.style.opacity="0";
-    el.style.transform="translateY(10px)";
-    setTimeout(()=>el.remove(),200);
-  },3000);
-}
-
-function saveState(){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
-}
-
-function loadState(){
-
-  const raw = localStorage.getItem(STORAGE_KEY);
-
-  if(raw){
-    try{
-      const parsed = JSON.parse(raw);
-      state = Object.assign(state,parsed);
-      state.settings = Object.assign({
-        currency:"EUR",
-        country:"PT"
-      },parsed.settings||{});
-      state.settings.currency="EUR";
-      migrateLegacyData();
-      return;
-    }catch(e){
-      console.error(e);
+    function getNumeroEspanhol(n) {
+      if (n in numEspeciaisES) return numEspeciaisES[n];
+      return "";
     }
-  }
-
-  seedData();
-  saveState();
-}
-
-function migrateLegacyData(){
-  /* Remove as localizações padrão antigas e converte-as em campos livres. */
-  const forbiddenNames=new Set(["armazém principal","loja"]);
-  const removedIds=new Set(
-    (state.locations||[])
-      .filter(l=>forbiddenNames.has(String(l.name||"").trim().toLowerCase()))
-      .map(l=>l.id)
-  );
-
-  state.locations=(state.locations||[]).filter(l=>!removedIds.has(l.id));
-
-  (state.products||[]).forEach(p=>{
-    if(p.minStock===undefined || p.minStock===null) p.minStock=2;
-    delete p.sku;
-    delete p.barcode;
-    if(removedIds.has(p.locationId)){
-      p.locationId="";
-      p.locationName="";
+    
+    const numeros = [];
+    for (let i = 1; i <= 29; i++) {
+      numeros.push({ ptMain: i.toString(), es: getNumeroEspanhol(i), visual: i.toString() });
     }
-    if(!p.locationName && p.locationId){
-      p.locationName=getLocation(p.locationId)?.name||"";
-    }
-  });
-
-  (state.movements||[]).forEach(m=>{
-    if(removedIds.has(m.locationId)){
-      m.locationId="";
-      m.locationName="";
-    }
-    if(!m.locationName && m.locationId){
-      m.locationName=getLocation(m.locationId)?.name||"";
-    }
-  });
-
-  (state.inventories||[]).forEach(inv=>{
-    if(removedIds.has(inv.locationId)){
-      inv.locationId="";
-      inv.locationName="";
-    }
-    if(!inv.locationName && inv.locationId){
-      inv.locationName=getLocation(inv.locationId)?.name||"";
-    }
-  });
-}
-
-function ensureLocationId(name){
-  const clean=String(name||"").trim();
-  if(!clean) return "";
-
-  const existing=state.locations.find(l=>String(l.name||"").trim().toLowerCase()===clean.toLowerCase());
-  if(existing) return existing.id;
-
-  const id=uid("loc");
-  state.locations.push({id,name:clean,description:""});
-  return id;
-}
-
-function seedData(){
-
-  /* As localizações são agora livres: o utilizador escreve o local. */
-  state.locations = [];
-  const warehouse = {id:"", name:"", description:""};
-  const shop = {id:"", name:"", description:""};
-
-  state.categories = [
-    {id:uid("cat"),name:"Anéis"},
-    {id:uid("cat"),name:"Alianças"},
-    {id:uid("cat"),name:"Brincos"},
-    {id:uid("cat"),name:"Pulseiras"},
-    {id:uid("cat"),name:"Colares"},
-    {id:uid("cat"),name:"Pendentes"},
-    {id:uid("cat"),name:"Fios"},
-    {id:uid("cat"),name:"Medalhas"},
-    {id:uid("cat"),name:"Relógios"},
-    {id:uid("cat"),name:"Outros"}
-  ];
-
-  const cat = name =>
-    state.categories.find(x=>x.name===name)?.id || "";
-
-  state.products = [
-    {
-      id:uid("prod"),
-      name:"Anel solitário em ouro",
-      categoryId:cat("Anéis"),
-      locationId:"",
-      quantity:3,
-      minStock:2,
-      price:349.90,
-      cost:185.00,
-      unit:"un",
-      description:"Anel solitário em ouro."
-    },
-    {
-      id:uid("prod"),
-      name:"Aliança em ouro",
-      categoryId:cat("Alianças"),
-      locationId:"",
-      quantity:2,
-      minStock:3,
-      price:499.90,
-      cost:270.00,
-      unit:"un",
-      description:"Aliança clássica em ouro."
-    },
-    {
-      id:uid("prod"),
-      name:"Brincos em ouro",
-      categoryId:cat("Brincos"),
-      locationId:"",
-      quantity:6,
-      minStock:2,
-      price:189.90,
-      cost:95.00,
-      unit:"un",
-      description:"Par de brincos em ouro."
-    },
-    {
-      id:uid("prod"),
-      name:"Pulseira em prata 925",
-      categoryId:cat("Pulseiras"),
-      locationId:"",
-      quantity:8,
-      minStock:3,
-      price:129.90,
-      cost:58.00,
-      unit:"un",
-      description:"Pulseira em prata 925."
-    }
-  ];
-
-  state.movements = [
-    {
-      id:uid("mov"),
-      type:"entrada",
-      productId:state.products[0].id,
-      quantity:12,
-      locationId:"",
-      note:"Stock inicial",
-      date:new Date(Date.now()-86400000*2).toISOString(),
-      user:"Administrador"
-    },
-    {
-      id:uid("mov"),
-      type:"entrada",
-      productId:state.products[1].id,
-      quantity:4,
-      locationId:"",
-      note:"Stock inicial",
-      date:new Date(Date.now()-86400000).toISOString(),
-      user:"Administrador"
-    }
-  ];
-
-  state.inventories = [];
-}
-
-
-/* =========================================================
-   DEFINIÇÕES — MOEDAS E PAÍSES
-   ========================================================= */
-
-function getAllCurrencies(){
-  try{
-    if(typeof Intl.supportedValuesOf==="function") return Intl.supportedValuesOf("currency");
-  }catch(e){}
-  return ["EUR","USD","GBP","CHF","JPY","CAD","AUD","BRL","CNY","INR"];
-}
-
-const COUNTRY_CODES = [
-"AF","AL","DZ","AS","AD","AO","AI","AQ","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BQ","BA","BW","BV","BR","IO","BN","BG","BF","BI","CV","KH","CM","CA","KY","CF","TD","CL","CN","CX","CC","CO","KM","CG","CD","CK","CR","CI","HR","CU","CW","CY","CZ","DK","DJ","DM","DO","EC","EG","SV","GQ","ER","EE","SZ","ET","FK","FO","FJ","FI","FR","GF","PF","TF","GA","GM","GE","DE","GH","GI","GR","GL","GD","GP","GU","GT","GG","GN","GW","GY","HT","HM","VA","HN","HK","HU","IS","IN","ID","IR","IQ","IE","IM","IL","IT","JM","JP","JE","JO","KZ","KE","KI","KP","KR","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MG","MW","MY","MV","ML","MT","MH","MQ","MR","MU","YT","MX","FM","MD","MC","MN","ME","MS","MA","MZ","MM","NA","NR","NP","NL","NC","NZ","NI","NE","NG","NU","NF","MK","MP","NO","OM","PK","PW","PS","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","RE","RO","RU","RW","BL","SH","KN","LC","MF","PM","VC","WS","SM","ST","SA","SN","RS","SC","SL","SG","SX","SK","SI","SB","SO","ZA","GS","SS","ES","LK","SD","SR","SJ","SE","CH","SY","TW","TJ","TZ","TH","TL","TG","TK","TO","TT","TN","TR","TM","TC","TV","UG","UA","AE","GB","US","UM","UY","UZ","VU","VE","VN","VG","VI","WF","EH","YE","ZM","ZW"
-];
-
-function renderSettingsOptions(){
-  const currency=document.getElementById("settingsCurrency");
-  const country=document.getElementById("settingsCountry");
-  if(!currency || !country) return;
-
-  // Esta versão usa exclusivamente Euro.
-  currency.innerHTML='<option value="EUR">EUR — €</option>';
-  currency.value="EUR";
-  state.settings.currency="EUR";
-
-  // Esta versão usa exclusivamente Portugal / Português.
-  country.innerHTML='<option value="PT">Portugal — Português</option>';
-  country.value="PT";
-  state.settings.country="PT";
-}
-
-function saveSettingsFromUI(){
-  state.settings.currency="EUR";
-  state.settings.country="PT";
-  saveState();
-  document.documentElement.lang="pt-PT";
-  document.documentElement.dir="ltr";
-  renderSettingsOptions();
-  renderCurrentPage();
-  toast("Definições atualizadas.","success");
-}
-
-
-/* =========================================================
-   IDIOMA DO PAÍS E MOEDA GLOBAL
-   ========================================================= */
-
-const COUNTRY_LANGUAGE = {
-  PT:"pt-PT", BR:"pt-BR", AO:"pt-PT", MZ:"pt-PT", CV:"pt-PT", GW:"pt-PT", ST:"pt-PT", TL:"pt-PT",
-  ES:"es-ES", MX:"es-MX", AR:"es-AR", CL:"es-CL", CO:"es-CO", PE:"es-PE", UY:"es-UY", PY:"es-PY", BO:"es-BO", EC:"es-EC", VE:"es-VE", CR:"es-CR", PA:"es-PA", GT:"es-GT", HN:"es-HN", SV:"es-SV", NI:"es-NI", DO:"es-DO", CU:"es-ES",
-  FR:"fr-FR", BE:"fr-FR", MC:"fr-FR", LU:"fr-FR", SN:"fr-FR", CI:"fr-FR", CM:"fr-FR", MG:"fr-FR", MA:"fr-FR", TN:"fr-FR", DZ:"fr-FR", HT:"fr-FR",
-  DE:"de-DE", AT:"de-AT", CH:"de-CH", LI:"de-DE",
-  IT:"it-IT", SM:"it-IT", VA:"it-IT",
-  NL:"nl-NL", SR:"nl-NL", BQ:"nl-NL", CW:"nl-NL", AW:"nl-NL",
-  GB:"en-GB", US:"en-US", CA:"en-CA", AU:"en-AU", NZ:"en-NZ", IE:"en-IE", IN:"en-IN", SG:"en-SG", ZA:"en-ZA", NG:"en-NG", KE:"en-KE", GH:"en-GH", PH:"en-PH", MY:"en-MY", MT:"en-GB", JM:"en-JM", TT:"en-TT", BS:"en-BS", BB:"en-BB", FJ:"en-FJ",
-  RU:"ru-RU", BY:"ru-RU", KZ:"ru-KZ", KG:"ru-KG",
-  UA:"uk-UA",
-  PL:"pl-PL", CZ:"cs-CZ", SK:"sk-SK", HU:"hu-HU", RO:"ro-RO", BG:"bg-BG", HR:"hr-HR", SI:"sl-SI", RS:"sr-RS", BA:"bs-BA", ME:"sr-ME", MK:"mk-MK", AL:"sq-AL", EE:"et-EE", LV:"lv-LV", LT:"lt-LT", GR:"el-GR", IS:"is-IS", FI:"fi-FI", SE:"sv-SE", NO:"nb-NO", DK:"da-DK",
-  TR:"tr-TR", IL:"he-IL", IR:"fa-IR", IQ:"ar-IQ", SA:"ar-SA", AE:"ar-AE", EG:"ar-EG", MA:"ar-MA", DZ:"ar-DZ", JO:"ar-JO", LB:"ar-LB", SY:"ar-SY", KW:"ar-KW", QA:"ar-QA", BH:"ar-BH", OM:"ar-OM", YE:"ar-YE", LY:"ar-LY", TN:"ar-TN",
-  CN:"zh-CN", TW:"zh-TW", HK:"zh-HK", MO:"zh-HK",
-  JP:"ja-JP", KR:"ko-KR",
-  VN:"vi-VN", TH:"th-TH", ID:"id-ID", MY:"ms-MY", LA:"lo-LA", KH:"km-KH", MM:"my-MM", BD:"bn-BD", NP:"ne-NP", PK:"ur-PK",
-  AM:"hy-AM", GE:"ka-GE", AZ:"az-AZ", UZ:"uz-UZ", TJ:"tg-TJ", TM:"tk-TM",
-  AF:"ps-AF", ET:"am-ET", SO:"so-SO", SW:"sw-KE", ZM:"en-ZM", ZW:"en-ZW"
-};
-
-const UI_TRANSLATIONS = {
-  "en": {
-    "Dashboard":"Dashboard","Artigos":"Jewelry","Joias":"Jewelry","Movimentos":"Movements","Inventários":"Inventories","Localizações":"Locations","Categorias":"Categories","Importar / Exportar":"Import / Export","Definições":"Settings","Nova joia":"New jewelry","Guardar joia":"Save jewelry","Cancelar":"Cancel","Nome do artigo *":"Item name *","Fotografia da joia":"Jewelry photo","Adicionar fotografia":"Add photo","Localização":"Location","Quantidade":"Quantity","Stock mínimo":"Minimum stock","Preço de venda":"Sale price","Preço de custo":"Cost price","Unidade":"Unit","Descrição":"Description","Pesquisar joias...":"Search jewelry...","Todos os movimentos":"All movements","Entradas":"Entries","Saídas":"Exits","Ajustes":"Adjustments","Transferências":"Transfers","Inventários":"Inventories","Artigo":"Item","Stock atual":"Current stock","Valor total":"Total value","Categoria":"Category","Utilizador":"User","Ações":"Actions","Último movimento":"Last movement","Gastos totais":"Total expenses","Vendas totais":"Total sales","Lucro total":"Total profit","Movimentos":"Movements","Stock baixo":"Low stock","Stock normal":"Normal stock","Repor":"Restock","Ver todos":"View all","Ver histórico":"View history","Entrada":"Entry","Saída":"Exit","Editar":"Edit","Eliminar":"Delete","Adicionar entrada":"Add entry","Registar saída":"Register exit","Guardar dados localmente":"Save data locally","Moeda":"Currency","País":"Country","Definições atualizadas.":"Settings updated.","Escolha qualquer moeda disponível no sistema.":"Choose any currency available in the system.","Escolha qualquer país disponível.":"Choose any country available.","Eliminar todos os dados":"Delete all data","Esta operação não pode ser desfeita.":"This operation cannot be undone.","Armazenamento local ativado.":"Local storage enabled.","Armazenamento local desativado.":"Local storage disabled.","Joia criada com sucesso.":"Jewelry created successfully.","Joia atualizada com sucesso.":"Jewelry updated successfully.","Joia eliminada.":"Jewelry deleted.","Entrada registada.":"Entry recorded.","Saída registada.":"Exit recorded.","Registar movimento":"Record movement","Observação":"Note","Valor total do movimento":"Movement total value","Stock após este movimento":"Stock after this movement","Stock atual:":"Current stock:","Stock baixo: ":"Low stock: ","Faça um novo pedido.":"Place a new order.","Sem movimentos":"No movements","Nenhum movimento":"No movement","Nenhuma joia encontrada":"No jewelry found","Artigos a repor":"Items to restock","Valor do stock":"Stock value","Valor estimado ao custo":"Estimated cost value","Gastos":"Expenses","Total gasto em entradas":"Total spent on entries","Lucro":"Profit","Lucro realizado nas vendas":"Profit from sales","Joias com stock baixo":"Jewelry with low stock","Stock controlado":"Stock under control","Ainda não existem movimentos.":"There are no movements yet."},
-  "es": {"Dashboard":"Panel","Artigos":"Joyas","Joias":"Joyas","Movimentos":"Movimientos","Inventários":"Inventarios","Localizações":"Ubicaciones","Categorias":"Categorías","Importar / Exportar":"Importar / Exportar","Definições":"Configuración","Nova joia":"Nueva joya","Guardar joia":"Guardar joya","Cancelar":"Cancelar","Nome do artigo *":"Nombre del artículo *","Fotografia da joia":"Foto de la joya","Adicionar fotografia":"Añadir foto","Localização":"Ubicación","Quantidade":"Cantidad","Stock mínimo":"Stock mínimo","Preço de venda":"Precio de venta","Preço de custo":"Precio de coste","Unidade":"Unidad","Descrição":"Descripción","Pesquisar joias...":"Buscar joyas...","Todos os movimentos":"Todos los movimientos","Entradas":"Entradas","Saídas":"Salidas","Artigo":"Artículo","Stock atual":"Stock actual","Valor total":"Valor total","Categoria":"Categoría","Utilizador":"Usuario","Ações":"Acciones","Gastos totais":"Gastos totales","Vendas totais":"Ventas totales","Lucro total":"Beneficio total","Stock baixo":"Stock bajo","Stock normal":"Stock normal","Repor":"Reponer","Ver todos":"Ver todos","Ver histórico":"Ver historial","Entrada":"Entrada","Saída":"Salida","Editar":"Editar","Eliminar":"Eliminar","Adicionar entrada":"Añadir entrada","Registar saída":"Registrar salida","Guardar dados localmente":"Guardar datos localmente","Moeda":"Moneda","País":"País","Definições atualizadas.":"Definições atualizadas."},
-  "fr": {"Dashboard":"Tableau de bord","Artigos":"Bijoux","Joias":"Bijoux","Movimentos":"Mouvements","Inventários":"Inventaires","Localizações":"Emplacements","Categorias":"Catégories","Importar / Exportar":"Importer / Exporter","Definições":"Paramètres","Nova joia":"Nouveau bijou","Guardar joia":"Enregistrer le bijou","Cancelar":"Annuler","Nome do artigo *":"Nom de l'article *","Fotografia da joia":"Photo du bijou","Adicionar fotografia":"Ajouter une photo","Localização":"Emplacement","Quantidade":"Quantité","Stock mínimo":"Stock minimum","Preço de venda":"Prix de vente","Preço de custo":"Prix de revient","Unidade":"Unité","Descrição":"Description","Pesquisar joias...":"Rechercher des bijoux...","Todos os movimentos":"Tous les mouvements","Entradas":"Entrées","Saídas":"Sorties","Artigo":"Article","Stock atual":"Stock actuel","Valor total":"Valeur totale","Categoria":"Catégorie","Utilizador":"Utilisateur","Ações":"Actions","Gastos totais":"Dépenses totales","Vendas totais":"Ventes totales","Lucro total":"Bénéfice total","Stock baixo":"Stock faible","Stock normal":"Stock normal","Repor":"Réapprovisionner","Ver todos":"Voir tout","Ver histórico":"Voir l'historique","Entrada":"Entrée","Saída":"Sortie","Editar":"Modifier","Eliminar":"Supprimer","Adicionar entrada":"Ajouter une entrée","Registar saída":"Enregistrer une sortie","Guardar dados localmente":"Enregistrer les données localement","Moeda":"Devise","País":"Pays"},
-  "de": {"Dashboard":"Dashboard","Artigos":"Schmuck","Joias":"Schmuck","Movimentos":"Bewegungen","Inventários":"Inventuren","Localizações":"Standorte","Categorias":"Kategorien","Importar / Exportar":"Importieren / Exportieren","Definições":"Einstellungen","Nova joia":"Neuer Schmuck","Guardar joia":"Schmuck speichern","Cancelar":"Abbrechen","Nome do artigo *":"Artikelname *","Fotografia da joia":"Schmuckfoto","Adicionar fotografia":"Foto hinzufügen","Localização":"Standort","Quantidade":"Menge","Stock mínimo":"Mindestbestand","Preço de venda":"Verkaufspreis","Preço de custo":"Kostenpreis","Unidade":"Einheit","Descrição":"Beschreibung","Pesquisar joias...":"Schmuck suchen...","Todos os movimentos":"Alle Bewegungen","Entradas":"Eingänge","Saídas":"Ausgänge","Artigo":"Artikel","Stock atual":"Aktueller Bestand","Valor total":"Gesamtwert","Categoria":"Kategorie","Utilizador":"Benutzer","Ações":"Aktionen","Gastos totais":"Gesamtausgaben","Vendas totais":"Gesamtverkäufe","Lucro total":"Gesamtgewinn","Stock baixo":"Niedriger Bestand","Stock normal":"Normaler Bestand","Repor":"Nachbestellen","Ver todos":"Alle anzeigen","Ver histórico":"Verlauf anzeigen","Entrada":"Eingang","Saída":"Ausgang","Editar":"Bearbeiten","Eliminar":"Löschen","Adicionar entrada":"Eingang hinzufügen","Registar saída":"Ausgang buchen","Guardar dados localmente":"Daten lokal speichern","Moeda":"Währung","País":"Land"},
-  "it": {"Dashboard":"Dashboard","Artigos":"Gioielli","Joias":"Gioielli","Movimentos":"Movimenti","Inventários":"Inventari","Localizações":"Posizioni","Categorias":"Categorie","Importar / Exportar":"Importa / Esporta","Definições":"Impostazioni","Nova joia":"Nuovo gioiello","Guardar joia":"Salva gioiello","Cancelar":"Annulla","Nome do artigo *":"Nome articolo *","Fotografia da joia":"Foto del gioiello","Adicionar fotografia":"Aggiungi foto","Localização":"Posizione","Quantidade":"Quantità","Stock mínimo":"Scorta minima","Preço de venda":"Prezzo di vendita","Preço de custo":"Prezzo di costo","Unidade":"Unità","Descrição":"Descrizione","Pesquisar joias...":"Cerca gioielli...","Todos os movimentos":"Tutti i movimenti","Entradas":"Entrate","Saídas":"Uscite","Artigo":"Articolo","Stock atual":"Scorta attuale","Valor total":"Valore totale","Categoria":"Categoria","Utilizador":"Utente","Ações":"Azioni","Gastos totais":"Spese totali","Vendas totais":"Vendite totali","Lucro total":"Profitto totale","Stock baixo":"Scorta bassa","Stock normal":"Scorta normale","Repor":"Riordinare","Ver todos":"Vedi tutti","Ver histórico":"Vedi storico","Entrada":"Entrata","Saída":"Uscita","Editar":"Modifica","Eliminar":"Elimina","Adicionar entrada":"Aggiungi entrata","Registar saída":"Registra uscita","Guardar dados localmente":"Salva dati localmente","Moeda":"Valuta","País":"Paese"},
-  "nl": {"Dashboard":"Dashboard","Artigos":"Sieraden","Joias":"Sieraden","Movimentos":"Bewegingen","Inventários":"Inventarissen","Localizações":"Locaties","Categorias":"Categorieën","Importar / Exportar":"Importeren / Exporteren","Definições":"Instellingen","Nova joia":"Nieuw sieraad","Guardar joia":"Sieraad opslaan","Cancelar":"Annuleren","Nome do artigo *":"Artikelnaam *","Fotografia da joia":"Foto van sieraad","Adicionar fotografia":"Foto toevoegen","Localização":"Locatie","Quantidade":"Aantal","Stock mínimo":"Minimumvoorraad","Preço de venda":"Verkoopprijs","Preço de custo":"Kostprijs","Unidade":"Eenheid","Descrição":"Beschrijving","Pesquisar joias...":"Sieraden zoeken...","Todos os movimentos":"Alle bewegingen","Entradas":"Ingangen","Saídas":"Uitgangen","Artigo":"Artikel","Stock atual":"Huidige voorraad","Valor total":"Totale waarde","Categoria":"Categorie","Utilizador":"Gebruiker","Ações":"Acties","Gastos totais":"Totale kosten","Vendas totais":"Totale verkopen","Lucro total":"Totale winst","Stock baixo":"Lage voorraad","Stock normal":"Normale voorraad","Repor":"Bijbestellen","Ver todos":"Alles bekijken","Ver histórico":"Geschiedenis bekijken","Entrada":"Ingang","Saída":"Uitgang","Editar":"Bewerken","Eliminar":"Verwijderen","Adicionar entrada":"Ingang toevoegen","Registar saída":"Uitgang registreren","Guardar dados localmente":"Gegevens lokaal opslaan","Moeda":"Valuta","País":"Land"},
-  "ar": {"Dashboard":"لوحة التحكم","Artigos":"المجوهرات","Joias":"المجوهرات","Movimentos":"الحركات","Inventários":"الجرد","Localizações":"المواقع","Categorias":"الفئات","Importar / Exportar":"استيراد / تصدير","Definições":"الإعدادات","Nova joia":"مجوهرات جديدة","Guardar joia":"حفظ المجوهرات","Cancelar":"إلغاء","Nome do artigo *":"اسم القطعة *","Fotografia da joia":"صورة المجوهرات","Adicionar fotografia":"إضافة صورة","Localização":"الموقع","Quantidade":"الكمية","Stock mínimo":"الحد الأدنى للمخزون","Preço de venda":"سعر البيع","Preço de custo":"سعر التكلفة","Unidade":"الوحدة","Descrição":"الوصف","Pesquisar joias...":"البحث عن المجوهرات...","Todos os movimentos":"كل الحركات","Entradas":"الإدخالات","Saídas":"الإخراجات","Artigo":"القطعة","Stock atual":"المخزون الحالي","Valor total":"القيمة الإجمالية","Categoria":"الفئة","Utilizador":"المستخدم","Ações":"الإجراءات","Gastos totais":"إجمالي المصروفات","Vendas totais":"إجمالي المبيعات","Lucro total":"إجمالي الربح","Stock baixo":"مخزون منخفض","Stock normal":"مخزون طبيعي","Repor":"إعادة الطلب","Ver todos":"عرض الكل","Ver histórico":"عرض السجل","Entrada":"إدخال","Saída":"إخراج","Editar":"تعديل","Eliminar":"حذف","Adicionar entrada":"إضافة إدخال","Registar saída":"تسجيل إخراج","Guardar dados localmente":"حفظ البيانات محليًا","Moeda":"العملة","País":"الدولة"},
-  "zh": {"Dashboard":"仪表板","Artigos":"珠宝","Joias":"珠宝","Movimentos":"库存变动","Inventários":"盘点","Localizações":"位置","Categorias":"类别","Importar / Exportar":"导入 / 导出","Definições":"设置","Nova joia":"新珠宝","Guardar joia":"保存珠宝","Cancelar":"取消","Nome do artigo *":"商品名称 *","Fotografia da joia":"珠宝照片","Adicionar fotografia":"添加照片","Localização":"位置","Quantidade":"数量","Stock mínimo":"最低库存","Preço de venda":"售价","Preço de custo":"成本价","Unidade":"单位","Descrição":"描述","Pesquisar joias...":"搜索珠宝...","Todos os movimentos":"所有变动","Entradas":"入库","Saídas":"出库","Artigo":"商品","Stock atual":"当前库存","Valor total":"总价值","Categoria":"类别","Utilizador":"用户","Ações":"操作","Gastos totais":"总支出","Vendas totais":"总销售额","Lucro total":"总利润","Stock baixo":"库存不足","Stock normal":"库存正常","Repor":"补货","Ver todos":"查看全部","Ver histórico":"查看历史","Entrada":"入库","Saída":"出库","Editar":"编辑","Eliminar":"删除","Adicionar entrada":"添加入库","Registar saída":"登记出库","Guardar dados localmente":"本地保存数据","Moeda":"货币","País":"国家"},
-  "ja": {"Dashboard":"ダッシュボード","Artigos":"ジュエリー","Joias":"ジュエリー","Movimentos":"在庫移動","Inventários":"棚卸し","Localizações":"場所","Categorias":"カテゴリ","Importar / Exportar":"インポート / エクスポート","Definições":"設定","Nova joia":"新しいジュエリー","Guardar joia":"ジュエリーを保存","Cancelar":"キャンセル","Nome do artigo *":"商品名 *","Fotografia da joia":"ジュエリー写真","Adicionar fotografia":"写真を追加","Localização":"場所","Quantidade":"数量","Stock mínimo":"最低在庫","Preço de venda":"販売価格","Preço de custo":"原価","Unidade":"単位","Descrição":"説明","Pesquisar joias...":"ジュエリーを検索...","Todos os movimentos":"すべての移動","Entradas":"入庫","Saídas":"出庫","Artigo":"商品","Stock atual":"現在庫","Valor total":"合計金額","Categoria":"カテゴリ","Utilizador":"ユーザー","Ações":"操作","Gastos totais":"総費用","Vendas totais":"総売上","Lucro total":"総利益","Stock baixo":"在庫不足","Stock normal":"在庫正常","Repor":"補充","Ver todos":"すべて表示","Ver histórico":"履歴を見る","Entrada":"入庫","Saída":"出庫","Editar":"編集","Eliminar":"削除","Adicionar entrada":"入庫を追加","Registar saída":"出庫を登録","Guardar dados localmente":"ローカルに保存","Moeda":"通貨","País":"国"},
-  "ko": {"Dashboard":"대시보드","Artigos":"주얼리","Joias":"주얼리","Movimentos":"재고 이동","Inventários":"재고 조사","Localizações":"위치","Categorias":"카테고리","Importar / Exportar":"가져오기 / 내보내기","Definições":"설정","Nova joia":"새 주얼리","Guardar joia":"주얼리 저장","Cancelar":"취소","Nome do artigo *":"상품명 *","Fotografia da joia":"주얼리 사진","Adicionar fotografia":"사진 추가","Localização":"위치","Quantidade":"수량","Stock mínimo":"최소 재고","Preço de venda":"판매가","Preço de custo":"원가","Unidade":"단위","Descrição":"설명","Pesquisar joias...":"주얼리 검색...","Todos os movimentos":"모든 이동","Entradas":"입고","Saídas":"출고","Artigo":"상품","Stock atual":"현재 재고","Valor total":"총액","Categoria":"카테고리","Utilizador":"사용자","Ações":"작업","Gastos totais":"총비용","Vendas totais":"총매출","Lucro total":"총이익","Stock baixo":"재고 부족","Stock normal":"재고 정상","Repor":"재입고","Ver todos":"모두 보기","Ver histórico":"기록 보기","Entrada":"입고","Saída":"출고","Editar":"편집","Eliminar":"삭제","Adicionar entrada":"입고 추가","Registar saída":"출고 등록","Guardar dados localmente":"로컬에 저장","Moeda":"통화","País":"국가"},
-  "ru": {"Dashboard":"Панель управления","Artigos":"Украшения","Joias":"Украшения","Movimentos":"Движения","Inventários":"Инвентаризация","Localizações":"Места хранения","Categorias":"Категории","Importar / Exportar":"Импорт / Экспорт","Definições":"Настройки","Nova joia":"Новое украшение","Guardar joia":"Сохранить украшение","Cancelar":"Отмена","Nome do artigo *":"Название товара *","Fotografia da joia":"Фото украшения","Adicionar fotografia":"Добавить фото","Localização":"Местоположение","Quantidade":"Количество","Stock mínimo":"Минимальный запас","Preço de venda":"Цена продажи","Preço de custo":"Себестоимость","Unidade":"Единица","Descrição":"Описание","Pesquisar joias...":"Поиск украшений...","Todos os movimentos":"Все движения","Entradas":"Приходы","Saídas":"Расходы","Artigo":"Товар","Stock atual":"Текущий запас","Valor total":"Общая стоимость","Categoria":"Категория","Utilizador":"Пользователь","Ações":"Действия","Gastos totais":"Общие расходы","Vendas totais":"Общие продажи","Lucro total":"Общая прибыль","Stock baixo":"Низкий запас","Stock normal":"Нормальный запас","Repor":"Пополнить","Ver todos":"Показать все","Ver histórico":"История","Entrada":"Приход","Saída":"Расход","Editar":"Изменить","Eliminar":"Удалить","Adicionar entrada":"Добавить приход","Registar saída":"Зарегистрировать расход","Guardar dados localmente":"Сохранять локально","Moeda":"Валюта","País":"Страна"}
-};
-
-function getUILanguage(){
-  return "pt";
-}
-
-function currentLocale(){
-  return "pt-PT";
-}
-
-function t(text){
-  const lang=getUILanguage();
-  const extra={
-    en:{"Definições atualizadas.":"Settings updated.","Operação cancelada.":"Operation cancelled.","Dados reinicializados.":"Data reset."},
-    es:{"Definições atualizadas.":"Configuración actualizada.","Operação cancelada.":"Operación cancelada.","Dados reinicializados.":"Datos reiniciados."},
-    fr:{"Definições atualizadas.":"Paramètres mis à jour.","Operação cancelada.":"Opération annulée.","Dados reinicializados.":"Données réinitialisées."},
-    de:{"Definições atualizadas.":"Einstellungen aktualisiert.","Operação cancelada.":"Vorgang abgebrochen.","Dados reinicializados.":"Daten zurückgesetzt."},
-    it:{"Definições atualizadas.":"Impostazioni aggiornate.","Operação cancelada.":"Operazione annullata.","Dados reinicializados.":"Dati reimpostati."},
-    nl:{"Definições atualizadas.":"Instellingen bijgewerkt.","Operação cancelada.":"Bewerking geannuleerd.","Dados reinicializados.":"Gegevens gereset."},
-    ar:{"Definições atualizadas.":"تم تحديث الإعدادات.","Operação cancelada.":"تم إلغاء العملية.","Dados reinicializados.":"تمت إعادة تعيين البيانات."},
-    zh:{"Definições atualizadas.":"设置已更新。","Operação cancelada.":"操作已取消。","Dados reinicializados.":"数据已重置。"},
-    ja:{"Definições atualizadas.":"設定を更新しました。","Operação cancelada.":"操作をキャンセルしました。","Dados reinicializados.":"データをリセットしました。"},
-    ko:{"Definições atualizadas.":"설정이 업데이트되었습니다.","Operação cancelada.":"작업이 취소되었습니다.","Dados reinicializados.":"데이터가 초기화되었습니다."},
-    ru:{"Definições atualizadas.":"Настройки обновлены.","Operação cancelada.":"Операция отменена.","Dados reinicializados.":"Данные сброшены."}
-  };
-  return UI_TRANSLATIONS[lang]?.[text] || extra[lang]?.[text] || text;
-}
-
-const ORIGINAL_TEXT = new WeakMap();
-const ORIGINAL_ATTRS = new WeakMap();
-
-function translateDOM(){
-  const lang=getUILanguage();
-  const dict=UI_TRANSLATIONS[lang]||{};
-
-  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-  const nodes=[];
-  while(walker.nextNode()) nodes.push(walker.currentNode);
-  nodes.forEach(node=>{
-    if(!ORIGINAL_TEXT.has(node)) ORIGINAL_TEXT.set(node,node.nodeValue);
-    const original=ORIGINAL_TEXT.get(node);
-    const trimmed=original.trim();
-    if(!trimmed || trimmed.length>140) return;
-    const translated=dict[trimmed] || trimmed;
-    node.nodeValue=original.replace(trimmed,translated);
-  });
-
-  document.querySelectorAll("[placeholder],[title]").forEach(el=>{
-    let attrs=ORIGINAL_ATTRS.get(el);
-    if(!attrs){
-      attrs={};
-      ["placeholder","title"].forEach(name=>{
-        if(el.hasAttribute(name)) attrs[name]=el.getAttribute(name);
-      });
-      ORIGINAL_ATTRS.set(el,attrs);
-    }
-    ["placeholder","title"].forEach(name=>{
-      if(attrs[name]!==undefined){
-        el.setAttribute(name,dict[attrs[name]] || attrs[name]);
-      }
-    });
-  });
-
-  document.documentElement.lang=currentLocale();
-  document.documentElement.dir=(getUILanguage()==="ar"?"rtl":"ltr");
-}
-
-/* =========================================================
-   NAVEGAÇÃO
-   ========================================================= */
-
-const pageNames = {
-  dashboard:"Dashboard",
-  products:"Artigos",
-  movements:"Movimentos",
-  inventories:"Inventários",
-  locations:"Localizações",
-  categories:"Categorias",
-  import:"Importar / Exportar",
-  settings:"Definições"
-};
-
-function navigate(page){
-
-  currentPage = page;
-
-  document.querySelectorAll(".page").forEach(el=>{
-    el.classList.add("hidden");
-  });
-
-  const target = document.getElementById("page-"+page);
-
-  if(target) target.classList.remove("hidden");
-
-  document.querySelectorAll(".nav button").forEach(btn=>{
-    btn.classList.toggle("active",btn.dataset.page===page);
-  });
-
-  document.getElementById("pageTitle").textContent =
-    t(pageNames[page] || page);
-
-  const topNewJewelryButton=document.getElementById("topNewJewelryButton");
-  if(topNewJewelryButton){
-    topNewJewelryButton.style.display = "none";
-  }
-
-  closeSidebar();
-
-  renderCurrentPage();
-}
-
-function renderCurrentPage(){
-
-  renderSelects();
-
-  switch(currentPage){
-
-    case "dashboard":
-      renderDashboard();
-      break;
-
-    case "products":
-      renderProducts();
-      break;
-
-    case "movements":
-      renderMovements();
-      break;
-
-    case "inventories":
-      renderInventories();
-      break;
-
-    case "locations":
-      renderLocations();
-      break;
-
-    case "categories":
-      renderCategories();
-      break;
-  }
-
-  translateDOM();
-}
-
-
-/* =========================================================
-   SIDEBAR MOBILE
-   ========================================================= */
-
-document.getElementById("mobileMenu").addEventListener("click",()=>{
-  document.getElementById("sidebar").classList.add("open");
-  document.getElementById("mobileOverlay").classList.add("show");
-});
-
-document.getElementById("mobileOverlay").addEventListener("click",closeSidebar);
-
-function closeSidebar(){
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("mobileOverlay").classList.remove("show");
-}
-
-document.querySelectorAll(".nav button").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    navigate(btn.dataset.page);
-  });
-});
-
-
-/* =========================================================
-   DASHBOARD
-   ========================================================= */
-
-function getLowStockProducts(){
-  return state.products.filter(p=>{
-    const min=Number(p.minStock ?? 2);
-    return Number(p.quantity||0)<=min;
-  });
-}
-
-function showLowStockNotification(product){
-  if(!product) return;
-  const min=Number(product.minStock ?? 2);
-  const qty=Number(product.quantity||0);
-  if(qty<=min){
-    toast(`⚠️ Stock baixo: ${product.name} tem ${numberPT(qty)} ${product.unit||"un"}. Faça um novo pedido.`,"warning");
-  }
-}
-
-function renderLowStockAlertBanner(products){
-  const box=document.getElementById("lowStockAlertBanner");
-  if(!box) return;
-  if(!products.length){
-    box.innerHTML="";
-    return;
-  }
-  const names=products.slice(0,8).map(p=>`<span class="stock-alert-item">${esc(p.name)}: ${numberPT(p.quantity)} ${esc(p.unit||"un")} / mín. ${numberPT(p.minStock ?? 2)}</span>`).join("");
-  box.innerHTML=`<div class="stock-alert-banner"><div><strong>⚠️ Stock baixo — é necessário repor</strong><div class="stock-alert-list">${names}</div></div><button class="btn btn-warning btn-sm" onclick="navigate('products')">Ver stock</button></div>`;
-}
-
-function renderDashboard(){
-
-  const products = state.products;
-
-  const quantity = products.reduce((sum,p)=>sum+Number(p.quantity||0),0);
-
-  const low = getLowStockProducts();
-
-  const value = products.reduce((sum,p)=>
-    sum + Number(p.quantity||0)*Number(p.cost||0),0
-  );
-
-  const profit = state.movements
-    .filter(m=>m.type==="saida")
-    .reduce((sum,m)=>sum + Number(m.profitValue ?? (Number(m.quantity||0)*(Number(m.unitPrice ?? getProduct(m.productId)?.price ?? 0)-Number(m.unitCost ?? getProduct(m.productId)?.cost ?? 0)))),0);
-
-  document.getElementById("statProducts").textContent =
-    numberPT(products.length);
-
-  document.getElementById("statQuantity").textContent =
-    numberPT(quantity);
-
-  document.getElementById("statLow").textContent =
-    numberPT(low.length);
-
-  document.getElementById("statValue").textContent =
-    money(value);
-
-  document.getElementById("statProfit").textContent =
-    money(profit);
-
-  renderLowStock(low);
-  renderLowStockAlertBanner(low);
-  renderRecentActivity();
-  renderLocationStats();
-  renderCategoryStats();
-}
-
-function renderLowStock(products){
-
-  const tbody = document.getElementById("lowStockTable");
-
-  if(!products.length){
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5">
-          <div class="empty">
-            <div class="empty-icon">✅</div>
-            <strong>Stock controlado</strong>
-            <span>Não existem artigos abaixo do stock mínimo.</span>
-          </div>
-        </td>
-      </tr>`;
-    return;
-  }
-
-  tbody.innerHTML = products.slice(0,8).map(p=>{
-
-    const location = getLocation(p.locationId);
-    const locationName = p.locationName || location?.name || "—";
-
-    return `
-      <tr>
-        <td>
-          <div class="product-name">${esc(p.name)}</div>
-          <div class="product-code">${esc(getCategory(p.categoryId)?.name||"")}</div>
-        </td>
-        <td>${esc(locationName)}</td>
-        <td><strong class="low">${numberPT(p.quantity)} ${esc(p.unit)}</strong></td>
-        <td>${numberPT(p.minStock)}</td>
-        <td><span class="badge badge-red">Stock baixo</span></td>
-      </tr>
-    `;
-
-  }).join("");
-}
-
-function renderRecentActivity(){
-
-  const box = document.getElementById("recentActivity");
-
-  const movements = [...state.movements]
-    .sort((a,b)=>new Date(b.date)-new Date(a.date))
-    .slice(0,7);
-
-  if(!movements.length){
-    box.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">🔄</div>
-        <strong>Sem movimentos</strong>
-        <span>Ainda não existem movimentos.</span>
-      </div>`;
-    return;
-  }
-
-  box.innerHTML = movements.map(m=>{
-
-    const p = getProduct(m.productId);
-
-    const positive = m.type==="entrada";
-    const negative = m.type==="saida";
-
-    const icon = positive ? "＋" : negative ? "−" : "↔";
-
-    const cls = positive ? "green" : negative ? "red" : "blue";
-
-    const sign = positive ? "+" : negative ? "-" : "";
-
-    return `
-      <div class="activity">
-
-        <div class="activity-icon ${cls}">
-          ${icon}
-        </div>
-
-        <div class="activity-info">
-          <strong>${esc(p?.name || "Joia eliminada")}</strong>
-          <span>${movementLabel(m.type)} · ${dateTime(m.date)}</span>
-        </div>
-
-        <div class="activity-qty">
-          ${sign}${numberPT(m.quantity)}
-        </div>
-
-      </div>
-    `;
-
-  }).join("");
-}
-
-function renderLocationStats(){
-
-  const box = document.getElementById("locationStats");
-
-  const names=[...new Set(state.products.map(p=>p.locationName || getLocation(p.locationId)?.name || "").filter(Boolean))];
-
-  if(!names.length){
-    box.innerHTML = `<div class="empty">Ainda não existem localizações preenchidas.</div>`;
-    return;
-  }
-
-  const total = state.products.reduce((s,p)=>s+Number(p.quantity||0),0);
-
-  box.innerHTML = names.map(name=>{
-
-    const qty = state.products
-      .filter(p=>(p.locationName || getLocation(p.locationId)?.name || "")===name)
-      .reduce((s,p)=>s+Number(p.quantity||0),0);
-
-    const percent = total ? Math.min(100,(qty/total)*100) : 0;
-
-    return `
-      <div style="margin-bottom:17px">
-
-        <div style="display:flex;justify-content:space-between;font-size:12px">
-          <strong>${esc(name)}</strong>
-          <span>${numberPT(qty)}</span>
-        </div>
-
-        <div class="progress">
-          <div class="progress-bar" style="width:${percent}%"></div>
-        </div>
-
-      </div>
-    `;
-
-  }).join("");
-}
-
-function renderCategoryStats(){
-
-  const box = document.getElementById("categoryStats");
-
-  const total = state.products.length;
-
-  if(!state.categories.length){
-    box.innerHTML = `<div class="empty">Sem categorias.</div>`;
-    return;
-  }
-
-  box.innerHTML = state.categories.map(cat=>{
-
-    const count = state.products.filter(p=>p.categoryId===cat.id).length;
-
-    const percent = total ? Math.round((count/total)*100) : 0;
-
-    return `
-      <div style="margin-bottom:15px">
-
-        <div style="display:flex;justify-content:space-between;font-size:12px">
-          <strong>${esc(cat.name)}</strong>
-          <span>${count} (${percent}%)</span>
-        </div>
-
-        <div class="progress">
-          <div class="progress-bar" style="width:${percent}%"></div>
-        </div>
-
-      </div>
-    `;
-
-  }).join("");
-}
-
-
-/* =========================================================
-   PRODUCTS
-   ========================================================= */
-
-function renderProducts(){
-
-  const tbody = document.getElementById("productsTable");
-
-  const search =
-    document.getElementById("productSearch")?.value
-      .toLowerCase().trim() || "";
-
-  const location =
-    document.getElementById("productLocationFilter")?.value || "";
-
-  let products = state.products.filter(p=>{
-
-    const text = [
-      p.name,
-      p.description,
-      getCategory(p.categoryId)?.name||"",
-      p.locationName || getLocation(p.locationId)?.name || ""
-    ].join(" ").toLowerCase();
-
-    if(search && !text.includes(search)) return false;
-    if(location && !(p.locationName || getLocation(p.locationId)?.name || "").toLowerCase().includes(location.toLowerCase())) return false;
-
-    return true;
-  });
-
-  if(!products.length){
-
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6">
-          <div class="empty">
-            <div class="empty-icon">📦</div>
-            <strong>Nenhuma joia encontrada</strong>
-            <span>Adicione uma joia ou altere os filtros.</span>
-          </div>
-        </td>
-      </tr>
-    `;
-
-    return;
-  }
-
-  tbody.innerHTML = products.map(p=>{
-
-    const cat = getCategory(p.categoryId);
-    const loc = getLocation(p.locationId);
-    const locationName = p.locationName || loc?.name || "—";
-
-    const isLow =
-      Number(p.quantity||0)<=Number(p.minStock||0);
-
-    return `
-      <tr>
-
-        <td>
-          <div class="product-cell">
-            ${p.photo ? `<img class="product-thumb" src="${p.photo}" alt="${esc(p.name)}">` : `<div class="product-thumb placeholder">💎</div>`}
-            <div>
-              <div class="product-name">${esc(p.name)}</div>
-              <div class="product-code">${esc(p.description||"")}</div>
-            </div>
-          </div>
-        </td>
-
-        <td>${esc(locationName)}</td>
-
-        <td>
-          <strong class="qty ${isLow?"low":"ok"}">
-            ${numberPT(p.quantity)}
-          </strong>
-          <span style="font-size:10px;color:#64748b">${esc(p.unit)}</span>
-        </td>
-
-        <td>${money(p.price)}</td>
-
-        <td>
-          ${
-            isLow
-            ? `<span class="badge badge-red">Baixo</span>`
-            : `<span class="badge badge-green">Normal</span>`
-          }
-        </td>
-
-        <td>
-          <div class="actions" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-
-            <button
-              class="action"
-              title="Editar"
-              onclick="editProduct('${p.id}')">
-              ✏️
-            </button>
-
-            <button
-              class="action"
-              title="Eliminar"
-              onclick="deleteProduct('${p.id}')">
-              🗑️
-            </button>
-
-          </div>
-        </td>
-
-      </tr>
-    `;
-
-  }).join("");
-}
-
-
-/* =========================================================
-   SELECTS
-   ========================================================= */
-
-function renderSelects(){
-
-  const categoryOptions =
-    `<option value="">Selecione...</option>` +
-    state.categories.map(c=>
-      `<option value="${esc(c.id)}">${esc(c.name)}</option>`
-    ).join("");
-
-  const locationOptions = "";
-
-  const productCategory=document.getElementById("productCategory");
-  if(productCategory){
-    const currentCategory=productCategory.value;
-    productCategory.innerHTML=categoryOptions;
-    if(currentCategory && state.categories.some(c=>c.id===currentCategory)){
-      productCategory.value=currentCategory;
-    }
-  }
-
-  const productOptions =
-    `<option value="">Selecione um artigo...</option>` +
-    state.products.map(p=>
-      `<option value="${esc(p.id)}">${esc(p.name)}</option>`
-    ).join("");
-
-
-  const movementProduct = document.getElementById("movementProduct");
-  if(movementProduct){
-    const current=movementProduct.value;
-    movementProduct.innerHTML=productOptions;
-    if(current) movementProduct.value=current;
-    syncMovementProductSearch();
-  }
-
-  const filterLoc = document.getElementById("productLocationFilter");
-  if(filterLoc){
-    /* O filtro de localização é texto livre. */
-    filterLoc.placeholder="Localização...";
-  }
-}
-
-function syncMovementProductSearch(){
-  const select=document.getElementById("movementProduct");
-  const input=document.getElementById("movementProductSearch");
-  if(!select || !input) return;
-  const p=getProduct(select.value);
-  input.value=p ? formatProductChoice(p) : "";
-  updateMovementProductHint();
-}
-
-function formatProductChoice(p){
-  if(!p) return "";
-  return p.name || "";
-}
-
-function renderMovementProductOptions(query=""){
-  const box=document.getElementById("movementProductOptions");
-  const input=document.getElementById("movementProductSearch");
-  if(!box || !input) return;
-
-  const q=String(query||"").toLowerCase().trim();
-  const rows=state.products.filter(p=>{
-    if(!q) return true;
-    return [p.name,p.description].join(" ").toLowerCase().includes(q);
-  }).slice(0,80);
-
-  if(!rows.length){
-    box.innerHTML=`<div class="searchable-empty">Nenhuma joia encontrada. Pode pesquisar pelo nome da joia.</div>`;
-  }else{
-    box.innerHTML=rows.map(p=>`
-      <div class="searchable-option" data-product-id="${esc(p.id)}">
-        <strong>${esc(p.name)}</strong>
-        <small>Stock: ${numberPT(p.quantity)} · ${money(p.price)} / un.</small>
-      </div>
-    `).join("");
-  }
-
-  box.classList.add("open");
-}
-
-function selectMovementProduct(id){
-  const select=document.getElementById("movementProduct");
-  const input=document.getElementById("movementProductSearch");
-  const box=document.getElementById("movementProductOptions");
-  if(!select) return;
-  select.value=id;
-  const p=getProduct(id);
-  if(input) input.value=p ? formatProductChoice(p) : "";
-  if(box) box.classList.remove("open");
-  const loc=document.getElementById("movementLocation");
-  if(p && loc) loc.value=p.locationId||"";
-  updateMovementTotal();
-  updateMovementProductHint();
-}
-
-function updateMovementProductHint(){
-  const p=getProduct(document.getElementById("movementProduct")?.value);
-  const hint=document.getElementById("movementProductHint");
-  if(!hint) return;
-  hint.textContent=p ? `Stock atual: ${numberPT(p.quantity)} · Preço de venda: ${money(p.price)} / un. · Custo: ${money(p.cost)} / un.` : "";
-}
-
-function updateMovementTotal(){
-  const p=getProduct(document.getElementById("movementProduct")?.value);
-  const q=Number(document.getElementById("movementQuantity")?.value)||0;
-  const type=document.getElementById("movementType")?.value||"entrada";
-  const total=p ? q*Number(type==="entrada" ? (p.cost||0) : (p.price||0)) : 0;
-  const el=document.getElementById("movementTotalValue");
-  if(el) el.textContent=money(total);
-
-  const stockEl=document.getElementById("movementStockPreview");
-  if(!stockEl) return;
-  const current=p ? Number(p.quantity||0) : 0;
-  let after=current;
-  if(type==="entrada") after=current+q;
-  else if(type==="saida") after=current-q;
-  else if(type==="ajuste") after=q;
-  const min=p ? Number(p.minStock ?? 2) : 2;
-  stockEl.classList.remove("low","critical");
-  if(p && after<=min) stockEl.classList.add(after<=0 ? "critical" : "low");
-  stockEl.innerHTML=`<span>Stock atual: <strong>${numberPT(current)}</strong> · Stock após este movimento</span><strong>${numberPT(after)} ${p ? esc(p.unit||"un") : "un"}</strong>`;
-}
-
-
-/* =========================================================
-   PRODUCT MODAL
-   ========================================================= */
-
-function openProductModal(id=null){
-
-  const form = document.getElementById("productForm");
-  form.reset();
-
-  document.getElementById("productId").value="";
-  document.getElementById("productModalTitle").textContent = id ? "Editar joia" : "Nova joia";
-  document.getElementById("productQuantity").value=0;
-  document.getElementById("productMin").value=2;
-  document.getElementById("productPrice").value=0;
-  document.getElementById("productCategory").value="";
-  document.getElementById("productUnit").value="un";
-  pendingProductPhoto="";
-  resetProductPhoto();
-
-  renderSelects();
-
-  if(id){
-    const p=getProduct(id);
-    if(!p) return;
-
-    document.getElementById("productId").value=p.id;
-    document.getElementById("productName").value=p.name||"";
-    document.getElementById("productLocation").value=p.locationName || getLocation(p.locationId)?.name || "";
-    document.getElementById("productQuantity").value=p.quantity ?? 0;
-    document.getElementById("productMin").value=p.minStock ?? 0;
-    document.getElementById("productPrice").value=p.price ?? 0;
-    document.getElementById("productCategory").value=p.categoryId || "";
-    document.getElementById("productUnit").value=p.unit||"un";
-    document.getElementById("productDescription").value=p.description||"";
-    pendingProductPhoto=p.photo||"";
-    if(pendingProductPhoto) showProductPhoto(pendingProductPhoto);
-  }
-
-  openModal("productModal");
-}
-
-function resetProductPhoto(){
-  const input=document.getElementById("productPhoto");
-  const preview=document.getElementById("productPhotoPreview");
-  const placeholder=document.getElementById("productPhotoPlaceholder");
-  const remove=document.getElementById("removeProductPhoto");
-  if(input) input.value="";
-  if(preview){ preview.src=""; preview.classList.add("hidden"); }
-  if(placeholder) placeholder.classList.remove("hidden");
-  if(remove) remove.classList.add("hidden");
-}
-
-function showProductPhoto(src){
-  const preview=document.getElementById("productPhotoPreview");
-  const placeholder=document.getElementById("productPhotoPlaceholder");
-  const remove=document.getElementById("removeProductPhoto");
-  if(!preview) return;
-  preview.src=src;
-  preview.classList.remove("hidden");
-  placeholder.classList.add("hidden");
-  remove.classList.remove("hidden");
-}
-
-function removeProductPhoto(event){
-  event.stopPropagation();
-  pendingProductPhoto="";
-  resetProductPhoto();
-}
-
-function handleProductPhoto(event){
-  const file=event.target.files[0];
-  if(!file) return;
-  if(!file.type.startsWith("image/")){
-    toast("Selecione uma imagem válida.","error");
-    return;
-  }
-  const reader=new FileReader();
-  reader.onload=()=>{
-    const img=new Image();
-    img.onload=()=>{
-      const max=900;
-      let width=img.width;
-      let height=img.height;
-      if(width>height && width>max){ height*=max/width; width=max; }
-      else if(height>max){ width*=max/height; height=max; }
-      const canvas=document.createElement("canvas");
-      canvas.width=Math.round(width);
-      canvas.height=Math.round(height);
-      canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
-      pendingProductPhoto=canvas.toDataURL("image/jpeg",0.82);
-      showProductPhoto(pendingProductPhoto);
-    };
-    img.src=reader.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function editProduct(id){
-  const p=getProduct(id);
-  if(!p){
-    toast("Não foi possível encontrar a joia.","error");
-    return;
-  }
-  openProductModal(id);
-}
-
-const productPhotoInput=document.getElementById("productPhoto");
-if(productPhotoInput) productPhotoInput.addEventListener("change",handleProductPhoto);
-
-document.getElementById("productForm").addEventListener("submit",e=>{
-  e.preventDefault();
-
-  const id=document.getElementById("productId").value.trim();
-  const existingEditingProduct=id ? getProduct(id) : null;
-
-  const typedLocation=document.getElementById("productLocation").value.trim();
-  const data={
-    name:document.getElementById("productName").value.trim(),
-    categoryId:document.getElementById("productCategory").value || "",
-    locationName:typedLocation,
-    locationId:ensureLocationId(typedLocation),
-    quantity:Number(document.getElementById("productQuantity").value)||0,
-    minStock:Number(document.getElementById("productMin").value)||0,
-    price:Number(document.getElementById("productPrice").value)||0,
-    cost:Number(existingEditingProduct?.cost||0),
-    unit:document.getElementById("productUnit").value,
-    description:document.getElementById("productDescription").value.trim(),
-    photo:pendingProductPhoto
-  };
-
-  if(!data.name){
-    toast("Introduza o nome da joia.","error");
-    return;
-  }
-
-  if(id){
-    const index=state.products.findIndex(p=>p.id===id);
-    if(index===-1){
-      toast("A joia não foi encontrada.","error");
-      return;
-    }
-    state.products[index]={...state.products[index],...data};
-    saveState();
-    closeModal("productModal");
-    toast("Joia atualizada com sucesso.","success");
-    renderCurrentPage();
-    return;
-  }
-
-  /*
-     Sem SKU/código de barras: o nome da joia identifica o artigo para o stock.
-     Se já existir, soma a quantidade.
-  */
-  const normalizedName=data.name.toLowerCase();
-  const existing=state.products.find(p=>
-    String(p.name||"").trim().toLowerCase()===normalizedName
-  );
-
-  if(existing){
-    const addedQuantity=data.quantity;
-    existing.quantity=Number(existing.quantity||0)+addedQuantity;
-    existing.minStock=data.minStock;
-    existing.price=data.price;
-    if(data.categoryId) existing.categoryId=data.categoryId;
-    existing.cost=data.cost;
-    existing.locationId=data.locationId||existing.locationId;
-    existing.locationName=data.locationName||existing.locationName||"";
-    existing.unit=data.unit||existing.unit;
-    existing.description=data.description||existing.description;
-    if(data.photo) existing.photo=data.photo;
-
-    if(addedQuantity>0){
-      state.movements.push({
-        id:uid("mov"),
-        type:"entrada",
-        productId:existing.id,
-        quantity:addedQuantity,
-        unitPrice:Number(existing.cost||0),
-        unitCost:Number(existing.cost||0),
-        totalValue:addedQuantity*Number(existing.cost||0),
-        expenseValue:addedQuantity*Number(existing.cost||0),
-        profitValue:0,
-        locationId:existing.locationId,
-        locationName:existing.locationName||"",
-        note:"Entrada automática por artigo com o mesmo código.",
-        date:new Date().toISOString(),
-        user:"Administrador"
-      });
-    }
-
-    saveState();
-    closeModal("productModal");
-    toast(`${numberPT(addedQuantity)} unidade(s) adicionada(s) à joia ${existing.name}.`,"success");
-    renderCurrentPage();
-    return;
-  }
-
-  const product={
-    id:uid("prod"),
-    ...data,
-    createdAt:new Date().toISOString()
-  };
-
-  state.products.push(product);
-
-  if(data.quantity>0){
-    state.movements.push({
-      id:uid("mov"),
-      type:"entrada",
-      productId:product.id,
-      quantity:data.quantity,
-      unitPrice:Number(data.cost||0),
-      unitCost:Number(data.cost||0),
-      totalValue:data.quantity*Number(data.cost||0),
-      expenseValue:data.quantity*Number(data.cost||0),
-      profitValue:0,
-      locationId:data.locationId,
-      locationName:data.locationName||"",
-      note:"Stock inicial / entrada de artigo.",
-      date:new Date().toISOString(),
-      user:"Administrador"
-    });
-  }
-
-  saveState();
-  closeModal("productModal");
-  toast("Joia criada com sucesso.","success");
-  renderCurrentPage();
-});
-
-function deleteProduct(id){
-
-  const p=getProduct(id);
-
-  if(!p) return;
-
-  if(!confirm(`Eliminar a joia "${p.name}"?`)) return;
-
-  state.products=state.products.filter(x=>x.id!==id);
-
-  saveState();
-
-  toast("Joia eliminada.","success");
-
-  renderCurrentPage();
-}
-
-
-/* =========================================================
-   MOVEMENTS
-   ========================================================= */
-
-function openMovementModal(type="entrada",productId=null,movementId=null){
-
-  renderSelects();
-
-  document.getElementById("movementType").value=type;
-  document.getElementById("movementModalTitle").textContent=
-    movementId ? "Editar movimento" : movementLabel(type);
-  document.getElementById("movementQuantity").value="";
-  document.getElementById("movementNote").value="";
-  document.getElementById("movementEditId").value=movementId||"";
-
-  const search=document.getElementById("movementProductSearch");
-  const box=document.getElementById("movementProductOptions");
-  if(search) search.value="";
-  if(box) box.classList.remove("open");
-
-  if(movementId){
-    const movement=state.movements.find(m=>m.id===movementId);
-
-    if(!movement){
-      toast("O movimento não foi encontrado.","error");
-      return;
-    }
-
-    document.getElementById("movementType").value=movement.type;
-    document.getElementById("movementQuantity").value=movement.quantity;
-    document.getElementById("movementLocation").value=movement.locationName || getLocation(movement.locationId)?.name || "";
-    document.getElementById("movementNote").value=movement.note||"";
-
-    selectMovementProduct(movement.productId);
-  }
-  else if(productId){
-    selectMovementProduct(productId);
-  }
-  else{
-    document.getElementById("movementProduct").value="";
-    updateMovementProductHint();
-    updateMovementTotal();
-  }
-
-  openModal("movementModal");
-}
-
-document.getElementById("movementForm").addEventListener("submit",e=>{
-
-  e.preventDefault();
-
-  const type=document.getElementById("movementType").value;
-  const productId=document.getElementById("movementProduct").value;
-  const quantity=Number(document.getElementById("movementQuantity").value)||0;
-  const typedLocation=document.getElementById("movementLocation").value.trim();
-  const locationId=ensureLocationId(typedLocation);
-  const note=document.getElementById("movementNote").value.trim();
-  const editId=document.getElementById("movementEditId").value.trim();
-  const product=getProduct(productId);
-
-  if(!product){
-    toast("Pesquise e selecione uma joia.","error");
-    return;
-  }
-
-  if(quantity<=0){
-    toast("A quantidade deve ser superior a zero.","error");
-    return;
-  }
-
-  /* EDIÇÃO: primeiro desfaz o efeito do movimento antigo. */
-  if(editId){
-
-    const oldMovement=state.movements.find(m=>m.id===editId);
-
-    if(!oldMovement){
-      toast("O movimento não foi encontrado.","error");
-      return;
-    }
-
-    if(oldMovement.type==="ajuste"){
-      toast("Movimentos de ajuste não podem ser editados. Elimine-o e crie um novo ajuste.","error");
-      return;
-    }
-
-    const oldProduct=getProduct(oldMovement.productId);
-
-    if(!oldProduct){
-      toast("A joia deste movimento já não existe.","error");
-      return;
-    }
-
-    /* Só permitimos editar o mesmo artigo nesta janela. */
-    if(oldMovement.productId!==productId){
-      toast("Para mudar de artigo, elimine este movimento e crie um novo.","error");
-      return;
-    }
-
-    if(oldMovement.type==="entrada"){
-      oldProduct.quantity=Number(oldProduct.quantity||0)-Number(oldMovement.quantity||0);
-    }
-
-    if(oldMovement.type==="saida"){
-      oldProduct.quantity=Number(oldProduct.quantity||0)+Number(oldMovement.quantity||0);
-    }
-
-    if(Number(oldProduct.quantity||0)<0){
-      toast("Não foi possível recalcular o stock deste movimento.","error");
-      return;
-    }
-
-    if(type==="saida" && Number(oldProduct.quantity||0)<quantity){
-      /* Repõe o movimento antigo antes de sair. */
-      if(oldMovement.type==="entrada"){
-        oldProduct.quantity=Number(oldProduct.quantity||0)+Number(oldMovement.quantity||0);
-      }
-      if(oldMovement.type==="saida"){
-        oldProduct.quantity=Number(oldProduct.quantity||0)-Number(oldMovement.quantity||0);
-      }
-
-      toast(`Stock insuficiente. Existem apenas ${numberPT(oldProduct.quantity)} unidade(s).`,"error");
-      return;
-    }
-
-    const unitPrice=type==="entrada" ? Number(product.cost||0) : Number(product.price||0);
-    const unitCost=Number(product.cost||0);
-    const totalValue=quantity*unitPrice;
-    const expenseValue=type==="entrada" ? quantity*unitCost : 0;
-    const profitValue=type==="saida" ? quantity*(Number(product.price||0)-unitCost) : 0;
-
-    if(type==="entrada"){
-      product.quantity=Number(product.quantity||0)+quantity;
-    }
-
-    if(type==="saida"){
-      product.quantity=Number(product.quantity||0)-quantity;
-    }
-
-    if(type==="ajuste"){
-      product.quantity=quantity;
-    }
-
-    oldMovement.type=type;
-    oldMovement.quantity=quantity;
-    oldMovement.unitPrice=unitPrice;
-    oldMovement.unitCost=unitCost;
-    oldMovement.totalValue=totalValue;
-    oldMovement.expenseValue=expenseValue;
-    oldMovement.profitValue=profitValue;
-    oldMovement.locationId=locationId||product.locationId;
-    oldMovement.locationName=typedLocation || product.locationName || getLocation(product.locationId)?.name || "";
-    oldMovement.note=note;
-    oldMovement.editedAt=new Date().toISOString();
-
-    saveState();
-    showLowStockNotification(product);
-    closeModal("movementModal");
-    closeModal("movementHistoryModal");
-
-    toast("Movimento atualizado com sucesso.","success");
-    renderCurrentPage();
-    return;
-  }
-
-  if(type==="saida" && Number(product.quantity||0)<quantity){
-    toast(`Stock insuficiente. Existem apenas ${numberPT(product.quantity)} unidade(s).`,"error");
-    return;
-  }
-
-  const unitPrice=type==="entrada" ? Number(product.cost||0) : Number(product.price||0);
-  const unitCost=Number(product.cost||0);
-  const totalValue=quantity*unitPrice;
-  const expenseValue=type==="entrada" ? quantity*unitCost : 0;
-  const profitValue=type==="saida" ? quantity*(Number(product.price||0)-unitCost) : 0;
-
-  if(type==="entrada") product.quantity=Number(product.quantity||0)+quantity;
-  if(type==="saida") product.quantity=Number(product.quantity||0)-quantity;
-  if(type==="ajuste") product.quantity=quantity;
-
-  const movement={
-    id:uid("mov"),
-    type,
-    productId,
-    quantity,
-    unitPrice,
-    unitCost,
-    totalValue,
-    expenseValue,
-    profitValue,
-    locationId:locationId||product.locationId,
-    locationName:typedLocation || product.locationName || getLocation(product.locationId)?.name || "",
-    note,
-    date:new Date().toISOString(),
-    user:"Administrador"
-  };
-
-  state.movements.push(movement);
-
-  saveState();
-  showLowStockNotification(product);
-  closeModal("movementModal");
-
-  toast(
-    type==="entrada"
-      ? `Entrada registada: ${numberPT(quantity)} · ${money(totalValue)}`
-      : type==="saida"
-        ? `Saída registada: ${numberPT(quantity)} · ${money(totalValue)}`
-        : `Movimento registado: ${money(totalValue)}`,
-    "success"
-  );
-
-  renderCurrentPage();
-});
-
-
-/* =========================================================
-   MOVIMENTOS AGRUPADOS POR JOIA
-   ========================================================= */
-
-function getSalesPeriodData(){
-
-  const now = new Date();
-  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  const dayOfWeek = startToday.getDay();
-  const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const startWeek = new Date(startToday);
-  startWeek.setDate(startToday.getDate() - mondayOffset);
-
-  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  const getPeriod = start => {
-    const movements = state.movements.filter(m => {
-      if(m.type !== "saida") return false;
-      const d = new Date(m.date);
-      return d >= start && d <= now;
+    const numerosGrandes = [30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 10000, 100000, 1000000];
+    numerosGrandes.forEach(n => {
+      numeros.push({ ptMain: n.toString(), es: getNumeroEspanhol(n), visual: n.toString() });
     });
 
-    return {
-      value: movements.reduce((sum,m) => sum + Number(m.totalValue ?? (Number(m.quantity||0) * Number(m.unitPrice||0))), 0),
-      quantity: movements.reduce((sum,m) => sum + Number(m.quantity||0), 0)
-    };
-  };
+    const cores = [
+      { ptMain: "Azul", es: "Azul", visual: "🟦" }, { ptMain: "Vermelho", es: "Rojo", visual: "🟥" },
+      { ptMain: "Verde", es: "Verde", visual: "🟩" }, { ptMain: "Amarelo", es: "Amarillo", visual: "🟨" },
+      { ptMain: "Preto", es: "Negro", visual: "⬛" }, { ptMain: "Branco", es: "Blanco", visual: "⬜" },
+      { ptMain: "Laranja", es: "Naranja", visual: "🟧" }, { ptMain: "Roxo", es: "Morado", visual: "🟪" },
+      { ptMain: "Castanho", es: "Marrón", visual: "🟫" }, { ptMain: "Rosa", es: "Rosa", visual: "🩷" },
+      { ptMain: "Cinzento", es: "Gris", visual: "🩶" }, { ptMain: "Dourado", es: "Dorado", visual: "🟡" },
+      { ptMain: "Turquesa", es: "Turquesa", visual: "🩵" }, { ptMain: "Violeta", es: "Violeta", visual: "💜" },
+      { ptMain: "Coral", es: "Coral", visual: "🧡" }
+    ];
 
-  return {
-    day: getPeriod(startToday),
-    week: getPeriod(startWeek),
-    month: getPeriod(startMonth)
-  };
-}
+    // TOP 10 OBJETOS
+    const objetos = [
+      { es: "Teléfono", visual: "📱", ptMain: "Telefone" },
+      { es: "Ordenador", visual: "💻", ptMain: "Computador" },
+      { es: "Reloj", visual: "⌚", ptMain: "Relógio" },
+      { es: "Teclado", visual: "⌨️", ptMain: "Teclado" },
+      { es: "Ratón", visual: "🖱️", ptMain: "Rato" },
+      { es: "Impresora", visual: "🖨️", ptMain: "Impressora" },
+      { es: "Cámara", visual: "📷", ptMain: "Câmara" },
+      { es: "Televisión", visual: "📺", ptMain: "Televisão" },
+      { es: "Bombilla", visual: "💡", ptMain: "Lâmpada" },
+      { es: "Lápiz", visual: "✏️", ptMain: "Lápis" }
+    ];
 
-function renderMovementSalesPeriods(){
+    // TOP 10 ANIMAIS
+    const animais = [
+      { es: "Perro", visual: "🐶", ptMain: "Cão" },
+      { es: "Gato", visual: "🐱", ptMain: "Gato" },
+      { es: "León", visual: "🦁", ptMain: "Leão" },
+      { es: "Tigre", visual: "🐯", ptMain: "Tigre" },
+      { es: "Oso", visual: "🐻", ptMain: "Urso" },
+      { es: "Elefante", visual: "🐘", ptMain: "Elefante" },
+      { es: "Jirafa", visual: "🦒", ptMain: "Girafa" },
+      { es: "Cebra", visual: "🦓", ptMain: "Zebra" },
+      { es: "Mono", visual: "🐒", ptMain: "Macaco" },
+      { es: "Lobo", visual: "🐺", ptMain: "Lobo" }
+    ];
 
-  const box = document.getElementById("movementSalesPeriods");
-  if(!box) return;
+    // TOP 20 ALIMENTOS
+    const alimentos = [
+      { es: "Manzana", visual: "🍎", ptMain: "Maçã" },
+      { es: "Plátano", visual: "🍌", ptMain: "Banana" },
+      { es: "Naranja", visual: "🍊", ptMain: "Laranja" },
+      { es: "Pan", visual: "🍞", ptMain: "Pão" },
+      { es: "Queso", visual: "🧀", ptMain: "Queijo" },
+      { es: "Arroz", visual: "🍚", ptMain: "Arroz" },
+      { es: "Carne", visual: "🥩", ptMain: "Carne" },
+      { es: "Sopa", visual: "🍲", ptMain: "Sopa" },
+      { es: "Pera", visual: "🍐", ptMain: "Pera" },
+      { es: "Melocotón", visual: "🍑", ptMain: "Pêssego" },
+      { es: "Uva", visual: "🍇", ptMain: "Uva" },
+      { es: "Sandía", visual: "🍉", ptMain: "Melancia" },
+      { es: "Melón", visual: "🍈", ptMain: "Melão" },
+      { es: "Piña", visual: "🍍", ptMain: "Ananás" },
+      { es: "Mango", visual: "🥭", ptMain: "Manga" },
+      { es: "Kiwi", visual: "🥝", ptMain: "Kiwi" },
+      { es: "Aguacate", visual: "🥑", ptMain: "Abacate" },
+      { es: "Limón", visual: "🍋", ptMain: "Limão" },
+      { es: "Tomate", visual: "🍅", ptMain: "Tomate" },
+      { es: "Zanahoria", visual: "🥕", ptMain: "Cenoura" }
+    ];
 
-  const sales = getSalesPeriodData();
+    // TOP 10 ROUPAS
+    const roupas = [
+      { es: "Camiseta", visual: "👕", ptMain: "Camiseta" },
+      { es: "Camisa", visual: "👔", ptMain: "Camisa" },
+      { es: "Pantalones", visual: "👖", ptMain: "Calças" },
+      { es: "Vestido", visual: "👗", ptMain: "Vestido" },
+      { es: "Falda", visual: "🥻", ptMain: "Saia" },
+      { es: "Chaqueta", visual: "🧥", ptMain: "Casaco" },
+      { es: "Abrigo", visual: "🥼", ptMain: "Sobretudo" },
+      { es: "Sudadera", visual: "🥋", ptMain: "Camisola" },
+      { es: "Calcetines", visual: "🧦", ptMain: "Meias" },
+      { es: "Zapatos", visual: "👟", ptMain: "Sapatos" }
+    ];
 
-  box.innerHTML = `
-    <div class="sales-period-card">
-      <small>Venda diária</small>
-      <strong>${money(sales.day.value)}</strong>
-      <span>${numberPT(sales.day.quantity)} unidade(s) vendida(s) hoje</span>
-    </div>
+    // TOP 40 CORPO HUMANO
+    const corpoHumano = [
+      { es: "Cabeza", visual: "🗣️", ptMain: "Cabeça" },
+      { es: "Cara", visual: "😀", ptMain: "Rosto" },
+      { es: "Pelo", visual: "🦱", ptMain: "Cabelo" },
+      { es: "Ojo", visual: "👁️", ptMain: "Olho" },
+      { es: "Oreja", visual: "👂", ptMain: "Orelha" },
+      { es: "Nariz", visual: "👃", ptMain: "Nariz" },
+      { es: "Boca", visual: "👄", ptMain: "Boca" },
+      { es: "Diente", visual: "🦷", ptMain: "Dente" },
+      { es: "Lengua", visual: "👅", ptMain: "Língua" },
+      { es: "Labio", visual: "💋", ptMain: "Lábio" },
+      { es: "Cuello", visual: "🧣", ptMain: "Pescoço" },
+      { es: "Hombro", visual: "👕", ptMain: "Ombro" },
+      { es: "Brazo", visual: "💪", ptMain: "Braço" },
+      { es: "Codo", visual: "📐", ptMain: "Cotovelo" },
+      { es: "Muñeca", visual: "⌚", ptMain: "Pulso" },
+      { es: "Mano", visual: "🤚", ptMain: "Mão" },
+      { es: "Dedo", visual: "👆", ptMain: "Dedo" },
+      { es: "Uña", visual: "💅", ptMain: "Unha" },
+      { es: "Pecho", visual: "🎽", ptMain: "Peito" },
+      { es: "Espalda", visual: "🧍", ptMain: "Costas" },
+      { es: "Barriga", visual: "🫄", ptMain: "Barriga" },
+      { es: "Cintura", visual: "🩳", ptMain: "Cintura" },
+      { es: "Cadera", visual: "👖", ptMain: "Anca" },
+      { es: "Pierna", visual: "🦵", ptMain: "Perna" },
+      { es: "Rodilla", visual: "🦿", ptMain: "Joelho" },
+      { es: "Tobillo", visual: "🥾", ptMain: "Tornozelo" },
+      { es: "Pie", visual: "🦶", ptMain: "Pé" },
+      { es: "Talón", visual: "👠", ptMain: "Calcanhar" },
+      { es: "Corazón", visual: "🫀", ptMain: "Coração" },
+      { es: "Pulmones", visual: "🫁", ptMain: "Pulmões" },
+      { es: "Cerebro", visual: "🧠", ptMain: "Cérebro" },
+      { es: "Hueso", visual: "🦴", ptMain: "Osso" },
+      { es: "Sangre", visual: "🩸", ptMain: "Sangue" },
+      { es: "Músculo", visual: "🏋️", ptMain: "Músculo" },
+      { es: "Piel", visual: "🖐️", ptMain: "Pele" },
+      { es: "Vena", visual: "💉", ptMain: "Veia" },
+      { es: "Arteria", visual: "🔴", ptMain: "Artéria" },
+      { es: "Estómago", visual: "🥣", ptMain: "Estômago" },
+      { es: "Hígado", visual: "🧫", ptMain: "Fígado" },
+      { es: "Riñón", visual: "🫘", ptMain: "Rim" }
+    ];
 
-    <div class="sales-period-card">
-      <small>Venda semanal</small>
-      <strong>${money(sales.week.value)}</strong>
-      <span>${numberPT(sales.week.quantity)} unidade(s) vendida(s) esta semana</span>
-    </div>
+    // TOP 20 TRANSPORTES (10 originais + 10 adicionados)
+    const transportes = [
+      { es: "Coche", visual: "🚗", ptMain: "Carro" },
+      { es: "Autobús", visual: "🚌", ptMain: "Autocarro" },
+      { es: "Tren", visual: "🚆", ptMain: "Comboio" },
+      { es: "Avión", visual: "✈️", ptMain: "Avião" },
+      { es: "Barco", visual: "🚢", ptMain: "Barco" },
+      { es: "Bicicleta", visual: "🚲", ptMain: "Bicicleta" },
+      { es: "Motocicleta", visual: "🏍️", ptMain: "Motocicleta" },
+      { es: "Helicóptero", visual: "🚁", ptMain: "Helicóptero" },
+      { es: "Cohete", visual: "🚀", ptMain: "Foguete" },
+      { es: "Submarino", visual: "🤿", ptMain: "Submarino" },
+      // 10 CARDS ADICIONADOS
+      { es: "Tranvía", visual: "🚊", ptMain: "Elétrico" },
+      { es: "Tractor", visual: "🚜", ptMain: "Trator" },
+      { es: "Camión", visual: "🚛", ptMain: "Camião" },
+      { es: "Furgoneta", visual: "🚐", ptMain: "Carrinha" },
+      { es: "Taxi", visual: "🚕", ptMain: "Táxi" },
+      { es: "Metro", visual: "🚇", ptMain: "Metropolitano" },
+      { es: "Monorriel", visual: "🚝", ptMain: "Monotrilho" },
+      { es: "Teleférico", visual: "🚡", ptMain: "Teleférico" },
+      { es: "Globo aerostático", visual: "🎈", ptMain: "Balão de ar quente" },
+      { es: "Velero", visual: "⛵", ptMain: "Veleiro" }
+    ];
 
-    <div class="sales-period-card">
-      <small>Venda mensal</small>
-      <strong>${money(sales.month.value)}</strong>
-      <span>${numberPT(sales.month.quantity)} unidade(s) vendida(s) este mês</span>
-    </div>
-  `;
-}
-
-function renderMovementGlobalTotals(){
-  const box=document.getElementById("movementGlobalTotals");
-  if(!box) return;
-
-  const expenses=state.movements
-    .filter(m=>m.type==="entrada")
-    .reduce((sum,m)=>sum+Number(m.expenseValue ?? (Number(m.quantity||0)*Number(m.unitCost ?? getProduct(m.productId)?.cost ?? 0))),0);
-
-  const sales=state.movements
-    .filter(m=>m.type==="saida")
-    .reduce((sum,m)=>sum+Number(m.totalValue ?? (Number(m.quantity||0)*Number(m.unitPrice ?? getProduct(m.productId)?.price ?? 0))),0);
-
-  const profit=state.movements
-    .filter(m=>m.type==="saida")
-    .reduce((sum,m)=>sum+Number(m.profitValue ?? (Number(m.quantity||0)*(Number(m.unitPrice ?? getProduct(m.productId)?.price ?? 0)-Number(m.unitCost ?? getProduct(m.productId)?.cost ?? 0)))),0);
-
-  const movements=state.movements.length;
-
-  box.innerHTML=`
-    <div class="movement-global-total"><span>Movimentos</span><strong>${numberPT(movements)}</strong></div>
-    <div class="movement-global-total"><span>Gastos totais</span><strong>${money(expenses)}</strong></div>
-    <div class="movement-global-total"><span>Vendas totais</span><strong>${money(sales)}</strong></div>
-    <div class="movement-global-total"><span>Lucro total</span><strong>${money(profit)}</strong></div>
-  `;
-}
-
-function getMovementGroups(){
-
-  const groups=new Map();
-
-  state.movements.forEach(m=>{
-
-    if(!groups.has(m.productId)){
-      groups.set(m.productId,[]);
-    }
-
-    groups.get(m.productId).push(m);
-
-  });
-
-  return Array.from(groups.entries()).map(([productId,movements])=>{
-
-    const product=getProduct(productId);
-
-    const entries=movements
-      .filter(m=>m.type==="entrada")
-      .reduce((s,m)=>s+Number(m.quantity||0),0);
-
-    const exits=movements
-      .filter(m=>m.type==="saida")
-      .reduce((s,m)=>s+Number(m.quantity||0),0);
-
-    const adjustments=movements
-      .filter(m=>m.type==="ajuste")
-      .reduce((s,m)=>s+Number(m.quantity||0),0);
-
-    const entryValue=movements
-      .filter(m=>m.type==="entrada")
-      .reduce((s,m)=>s+Number(m.totalValue ?? (Number(m.quantity||0)*Number(m.unitPrice||0))),0);
-
-    const exitValue=movements
-      .filter(m=>m.type==="saida")
-      .reduce((s,m)=>s+Number(m.totalValue ?? (Number(m.quantity||0)*Number(m.unitPrice||0))),0);
-
-    const expenseValue=movements
-      .filter(m=>m.type==="entrada")
-      .reduce((s,m)=>s+Number(m.expenseValue ?? (Number(m.quantity||0)*Number(m.unitCost ?? product?.cost ?? 0))),0);
-
-    const profitValue=movements
-      .filter(m=>m.type==="saida")
-      .reduce((s,m)=>s+Number(m.profitValue ?? (Number(m.quantity||0)*(Number(m.unitPrice ?? product?.price ?? 0)-Number(m.unitCost ?? product?.cost ?? 0)))),0);
-
-    const totalValue=movements
-      .reduce((s,m)=>s+Number(m.totalValue ?? (Number(m.quantity||0)*Number(m.unitPrice||0))),0);
-
-    const latest=[...movements].sort(
-      (a,b)=>new Date(b.date)-new Date(a.date)
-    )[0];
-
-    return {
-      productId,
-      product,
-      movements,
-      entries,
-      exits,
-      adjustments,
-      entryValue,
-      exitValue,
-      expenseValue,
-      profitValue,
-      totalValue,
-      latest
+    const catalogosPadrao = {
+      alfabeto: { nome: "Alfabeto 🅰️", data: alfabeto },
+      numeros: { nome: "Números 🔢", data: numeros },
+      cores: { nome: "Cores 🎨", data: cores },
+      objetos: { nome: "Objetos 📦", data: objetos },
+      animais: { nome: "Animais 🦁", data: animais },
+      alimentos: { nome: "Alimentos 🍕", data: alimentos },
+      roupas: { nome: "Roupas 👕", data: roupas },
+      corpo: { nome: "Corpo Humano 🧠", data: corpoHumano },
+      transportes: { nome: "Transportes 🚗", data: transportes }
     };
 
-  }).sort((a,b)=>
-    new Date(b.latest?.date||0)-new Date(a.latest?.date||0)
-  );
-}
-
-
-function renderMovements(){
-
-  const tbody=document.getElementById("movementsTable");
-  const search=document.getElementById("movementSearch")?.value.toLowerCase().trim()||"";
-  const type=document.getElementById("movementTypeFilter")?.value||"";
-
-  renderMovementGlobalTotals();
-  renderMovementSalesPeriods();
-
-  let groups=getMovementGroups();
-
-  groups=groups.filter(group=>{
-
-    const p=group.product;
-
-    const text=[
-      p?.name||"",
-      p?.description||"",
-      p?.locationName||"",
-      group.movements.map(m=>m.note||"").join(" "),
-      group.movements.map(m=>movementLabel(m.type)).join(" ")
-    ].join(" ").toLowerCase();
-
-    if(search && !text.includes(search)) return false;
-
-    if(type && !group.movements.some(m=>m.type===type)) return false;
-
-    return true;
-  });
-
-  if(!groups.length){
-
-    tbody.innerHTML=`
-      <tr>
-        <td colspan="10">
-          <div class="empty">
-            <div class="empty-icon">🔄</div>
-            <strong>Nenhum movimento</strong>
-            <span>Não existem movimentos para apresentar.</span>
-          </div>
-        </td>
-      </tr>`;
-
-    return;
-  }
-
-  tbody.innerHTML=groups.map(group=>{
-
-    const p=group.product;
-    const l=getLocation(p?.locationId || group.latest?.locationId);
-    const locationName=p?.locationName || group.latest?.locationName || l?.name || "—";
-
-    const hasEntry=group.entries>0;
-    const hasExit=group.exits>0;
-    const hasAdjustment=group.adjustments>0;
-
-    let typeHtml="";
-
-    if(hasEntry){
-      typeHtml+=`<span class="badge badge-green">Entrada</span> `;
-    }
-
-    if(hasExit){
-      typeHtml+=`<span class="badge badge-red">Saída</span> `;
-    }
-
-    if(hasAdjustment){
-      typeHtml+=`<span class="badge badge-orange">Ajuste</span>`;
-    }
-
-
-    const quantityHtml=`
-      <div class="movement-summary">
-        ${hasEntry ? `<div class="movement-summary-line"><span class="badge badge-green">+${numberPT(group.entries)}</span> entradas</div>` : ""}
-        ${hasExit ? `<div class="movement-summary-line"><span class="badge badge-red">-${numberPT(group.exits)}</span> saídas</div>` : ""}
-      </div>
-    `;
-
-    const valueHtml=`
-      <div class="movement-summary">
-        ${hasEntry ? `<div class="movement-summary-line">Gastos: <strong>${money(group.expenseValue)}</strong></div>` : ""}
-        ${hasExit ? `<div class="movement-summary-line">Vendas: <strong>${money(group.exitValue)}</strong></div>` : ""}
-        ${hasExit ? `<div class="movement-summary-line">Lucro: <strong>${money(group.profitValue)}</strong></div>` : ""}
-        <div class="movement-summary-total">Total: ${money(group.totalValue)}</div>
-      </div>
-    `;
-
-    return `
-      <tr>
-        <td>
-          <strong>${dateTime(group.latest?.date)}</strong>
-          <div class="product-code">${group.movements.length} movimento(s)</div>
-        </td>
-
-        <td>${typeHtml||'<span class="badge badge-blue">Movimento</span>'}</td>
-
-        <td>
-          <div class="product-name">${esc(p?.name||"Artigo eliminado")}</div>
-          <div class="product-code">${esc(p?.categoryId ? (getCategory(p.categoryId)?.name||"") : "")}</div>
-        </td>
-
-        <td>${quantityHtml}</td>
-
-        <td>
-          <div class="movement-stock-cell">
-            <span class="movement-stock-number ${Number(p?.quantity||0)<=Number(p?.minStock ?? 2)?"low":"ok"}">${numberPT(p?.quantity||0)} ${esc(p?.unit||"un")}</span>
-            <span class="badge ${Number(p?.quantity||0)<=Number(p?.minStock ?? 2)?"badge-red":"badge-green"}">${Number(p?.quantity||0)<=Number(p?.minStock ?? 2)?`Repor · mín. ${numberPT(p?.minStock ?? 2)}`:"Stock normal"}</span>
-          </div>
-        </td>
-
-        <td>${esc(getCategory(p?.categoryId)?.name || "—")}</td>
-
-        <td>${valueHtml}</td>
-
-        <td>${esc(locationName)}</td>
-
-        <td>${esc(group.latest?.user||"Administrador")}</td>
-
-        <td>
-          <div class="movement-actions">
-            <button
-              class="action movement-entry-action"
-              title="Adicionar entrada"
-              onclick="openMovementModal('entrada','${group.productId}')">
-              ＋
-            </button>
-
-            <button
-              class="action movement-exit-action"
-              title="Registar saída"
-              onclick="openMovementModal('saida','${group.productId}')">
-              −
-            </button>
-
-            <button
-              class="action"
-              title="Ver, editar ou eliminar movimentos"
-              onclick="openMovementHistory('${group.productId}')">
-              ✏️
-            </button>
-
-            <button
-              class="action"
-              title="Eliminar artigo dos movimentos"
-              onclick="deleteAllProductMovements('${group.productId}')">
-              🗑️
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-
-  }).join("");
-}
-
-
-/* =========================================================
-   HISTÓRICO DE UMA JOIA
-   ========================================================= */
-
-function openMovementHistory(productId){
-
-  const product=getProduct(productId);
-
-  if(!product){
-    toast("A joia não foi encontrada.","error");
-    return;
-  }
-
-  const movements=state.movements
-    .filter(m=>m.productId===productId)
-    .sort((a,b)=>new Date(b.date)-new Date(a.date));
-
-  document.getElementById("movementHistoryTitle").textContent=
-    `Movimentos — ${product.name}`;
-
-  document.getElementById("movementHistorySubtitle").textContent=
-    `Stock atual: ${numberPT(product.quantity)} · ${money(product.price)} / un. · Localização: ${product.locationName || getLocation(product.locationId)?.name || "—"}`;
-
-  const box=document.getElementById("movementHistoryList");
-
-  if(!movements.length){
-    box.innerHTML=`
-      <div class="movement-history-empty">
-        Não existem movimentos para esta joia.
-      </div>`;
-  }
-  else{
-    box.innerHTML=movements.map(m=>{
-
-      const unitPrice=Number(m.unitPrice ?? product.price ?? 0);
-      const totalValue=Number(
-        m.totalValue ??
-        (Number(m.quantity||0)*unitPrice)
-      );
-      const expenseValue=Number(
-        m.expenseValue ??
-        (m.type==="entrada" ? Number(m.quantity||0)*Number(m.unitCost ?? product.cost ?? 0) : 0)
-      );
-      const profitValue=Number(
-        m.profitValue ??
-        (m.type==="saida" ? Number(m.quantity||0)*(Number(m.unitPrice ?? product.price ?? 0)-Number(m.unitCost ?? product.cost ?? 0)) : 0)
-      );
-
-      const badge=
-        m.type==="entrada"
-          ? "badge-green"
-          : m.type==="saida"
-            ? "badge-red"
-            : "badge-orange";
-
-      const sign=
-        m.type==="entrada"
-          ? "+"
-          : m.type==="saida"
-            ? "-"
-            : "";
-
-      return `
-        <div class="movement-history-item">
-
-          <div class="movement-history-top">
-
-            <div class="movement-history-info">
-
-              <div>
-                <span class="badge ${badge}">
-                  ${esc(movementLabel(m.type))}
-                </span>
-
-                <strong style="margin-left:6px">
-                  ${sign}${numberPT(m.quantity)}
-                </strong>
-              </div>
-
-              <div class="movement-history-meta">
-                ${dateTime(m.date)} · ${esc(m.locationName || getLocation(m.locationId)?.name || "—")} · ${esc(m.user||"Administrador")}
-              </div>
-
-            </div>
-
-            <div class="movement-history-actions">
-
-              <button
-                class="action"
-                title="Editar movimento"
-                onclick="editMovement('${m.id}')">
-                ✏️
-              </button>
-
-              <button
-                class="action"
-                title="Eliminar movimento"
-                onclick="deleteMovement('${m.id}')">
-                🗑️
-              </button>
-
-            </div>
-
-          </div>
-
-          <div class="movement-history-value">
-            <span>
-              ${money(unitPrice)} / un.
-            </span>
-
-            <strong>
-              ${money(totalValue)}
-            </strong>
-          </div>
-
-          <div class="movement-history-finance">
-            ${m.type==="entrada" ? `Gasto: <strong>${money(expenseValue)}</strong>` : ""}
-            ${m.type==="saida" ? `Lucro: <strong>${money(profitValue)}</strong>` : ""}
-          </div>
-
-          ${
-            m.note
-              ? `<div class="movement-history-meta" style="margin-top:7px">Observação: ${esc(m.note)}</div>`
-              : ""
-          }
-
-        </div>
-      `;
-
-    }).join("");
-  }
-
-  openModal("movementHistoryModal");
-}
-
-
-function editMovement(movementId){
-
-  const movement=state.movements.find(m=>m.id===movementId);
-
-  if(!movement){
-    toast("O movimento não foi encontrado.","error");
-    return;
-  }
-
-  if(movement.type==="ajuste"){
-    toast("Movimentos de ajuste não podem ser editados.","error");
-    return;
-  }
-
-  openMovementModal(
-    movement.type,
-    movement.productId,
-    movement.id
-  );
-}
-
-
-function deleteMovement(movementId){
-
-  const movement=state.movements.find(m=>m.id===movementId);
-
-  if(!movement){
-    toast("O movimento não foi encontrado.","error");
-    return;
-  }
-
-  const product=getProduct(movement.productId);
-
-  if(!product){
-    if(!confirm("Eliminar este movimento?")) return;
-    state.movements=state.movements.filter(m=>m.id!==movementId);
-    saveState();
-    toast("Movimento eliminado.","success");
-    renderCurrentPage();
-    return;
-  }
-
-  if(!confirm(
-    `Eliminar o movimento de ${numberPT(movement.quantity)} unidade(s) de "${product.name}"?\\n\\nO stock será recalculado automaticamente.`
-  )){
-    return;
-  }
-
-  if(movement.type==="entrada"){
-    product.quantity=Number(product.quantity||0)-Number(movement.quantity||0);
-  }
-
-  if(movement.type==="saida"){
-    product.quantity=Number(product.quantity||0)+Number(movement.quantity||0);
-  }
-
-  if(movement.type==="ajuste"){
-    toast("Para eliminar um ajuste, faça primeiro um novo ajuste de stock.","warning");
-    return;
-  }
-
-  if(Number(product.quantity||0)<0){
-    toast("Não é possível eliminar este movimento porque o stock ficaria negativo.","error");
-    return;
-  }
-
-  state.movements=
-    state.movements.filter(m=>m.id!==movementId);
-
-  saveState();
-
-  toast("Movimento eliminado e stock recalculado.","success");
-
-  openMovementHistory(product.id);
-  renderCurrentPage();
-}
-
-
-function deleteAllProductMovements(productId){
-
-  /*
-     Uma linha de Movimentos pode continuar a existir mesmo depois
-     de a ficha da joia ter sido eliminada. Nesse caso o produto é
-     null, mas os movimentos antigos continuam guardados.
-     Nunca fazemos return só porque o produto não existe.
-  */
-  const product=getProduct(productId);
-
-  const movements=state.movements.filter(
-    m=>m.productId===productId
-  );
-
-  if(!movements.length){
-    state.movements=state.movements.filter(m=>m.productId!==productId);
-    saveState();
-    closeModal("movementHistoryModal");
-    renderCurrentPage();
-    return;
-  }
-
-  const articleName=product?.name || "Artigo eliminado";
-
-  if(!confirm(
-    `Eliminar todos os ${movements.length} movimentos de "${articleName}"?\n\nEsta ação remove o artigo do histórico de Movimentos.`
-  )){
-    return;
-  }
-
-  /* Remove o histórico completo desse artigo. */
-  if(product){
-    product.quantity=0;
-  }
-
-  state.movements=state.movements.filter(
-    m=>m.productId!==productId
-  );
-
-  saveState();
-  closeModal("movementHistoryModal");
-  toast("Movimentos eliminados com sucesso.","success");
-  renderCurrentPage();
-}
-
-/* =========================================================
-   INVENTORIES
-   ========================================================= */
-
-function openInventoryModal(){
-
-  renderSelects();
-
-  document.getElementById("inventoryForm").reset();
-
-  document.getElementById("inventoryDate").value=todayInput();
-
-  openModal("inventoryModal");
-}
-
-document.getElementById("inventoryForm").addEventListener("submit",e=>{
-
-  e.preventDefault();
-
-  const name=document.getElementById("inventoryName").value.trim();
-  const locationName=document.getElementById("inventoryLocation").value.trim();
-  const locationId=ensureLocationId(locationName);
-  const date=document.getElementById("inventoryDate").value;
-
-  if(!name){
-    toast("Introduza o nome do inventário.","error");
-    return;
-  }
-
-  const inventory={
-    id:uid("inv"),
-    name,
-    locationId,
-    locationName,
-    date:date || todayInput(),
-    status:"aberto",
-    createdAt:new Date().toISOString(),
-    counts:{}
-  };
-
-  state.inventories.push(inventory);
-
-  saveState();
-
-  closeModal("inventoryModal");
-
-  toast("Inventário criado.","success");
-
-  renderInventories();
-});
-
-function renderInventories(){
-
-  const box=document.getElementById("inventoriesList");
-
-  if(!state.inventories.length){
-
-    box.innerHTML=`
-      <div class="card" style="grid-column:1/-1">
-        <div class="empty">
-          <div class="empty-icon">📋</div>
-          <strong>Nenhum inventário</strong>
-          <span>Crie o primeiro inventário para começar uma contagem.</span>
-        </div>
-      </div>`;
-
-    return;
-  }
-
-  box.innerHTML=state.inventories.map(inv=>{
-
-    const loc=getLocation(inv.locationId);
-    const locationName=inv.locationName || loc?.name || "Todas as localizações";
-
-    const total=state.products.filter(p=>
-      !inv.locationId || p.locationId===inv.locationId
-    ).length;
-
-    const counted=Object.keys(inv.counts||{}).length;
-
-    const percent=total ? Math.round((counted/total)*100) : 0;
-
-    return `
-      <div class="card inventory-card">
-
-        <div style="display:flex;justify-content:space-between;gap:10px">
-
-          <div>
-            <h3>${esc(inv.name)}</h3>
-            <p>${esc(locationName)}</p>
-          </div>
-
-          <span class="badge ${
-            inv.status==="fechado"
-            ?"badge-green"
-            :"badge-orange"
-          }">
-            ${inv.status==="fechado"?"Fechado":"Aberto"}
-          </span>
-
-        </div>
-
-        <div style="margin-top:18px">
-
-          <div style="display:flex;justify-content:space-between;font-size:11px">
-            <span>Progresso</span>
-            <strong>${percent}%</strong>
-          </div>
-
-          <div class="progress">
-            <div class="progress-bar" style="width:${percent}%"></div>
-          </div>
-
-        </div>
-
-        <div class="inventory-card-bottom">
-
-          <div>
-            <span style="font-size:11px;color:#64748b">
-              ${counted} de ${total} artigos
-            </span>
-          </div>
-
-          <div class="actions">
-
-            <button
-              class="action"
-              onclick="countInventory('${inv.id}')">
-              📋
-            </button>
-
-            <button
-              class="action"
-              onclick="deleteInventory('${inv.id}')">
-              🗑️
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-    `;
-
-  }).join("");
-}
-
-function countInventory(id){
-
-  const inv=state.inventories.find(i=>i.id===id);
-
-  if(!inv) return;
-
-  const products=state.products.filter(p=>
-    !inv.locationId || p.locationId===inv.locationId
-  );
-
-  if(!products.length){
-    toast("Não existem artigos nesta localização.","warning");
-    return;
-  }
-
-  const first=products.find(p=>inv.counts[p.id]===undefined)||products[0];
-
-  const value=prompt(
-    `Contagem para "${first.name}"\nStock atual: ${first.quantity}\n\nIntroduza a quantidade contada:`,
-    inv.counts[first.id] ?? first.quantity
-  );
-
-  if(value===null) return;
-
-  const count=Number(value);
-
-  if(isNaN(count)||count<0){
-    toast("Quantidade inválida.","error");
-    return;
-  }
-
-  const previous=first.quantity;
-
-  inv.counts[first.id]=count;
-
-  const difference=count-previous;
-
-  if(difference!==0){
-
-    first.quantity=count;
-
-    state.movements.push({
-      id:uid("mov"),
-      type:"inventario",
-      productId:first.id,
-      quantity:Math.abs(difference),
-      locationId:first.locationId,
-      locationName:first.locationName || getLocation(first.locationId)?.name || "",
-      note:`Contagem de inventário: ${count}`,
-      date:new Date().toISOString(),
-      user:"Administrador"
-    });
-
-  }
-
-  saveState();
-
-  toast(`Contagem registada para ${first.name}.`,"success");
-
-  renderInventories();
-}
-
-
-/* =========================================================
-   LOCATIONS
-   ========================================================= */
-
-function openLocationModal(){
-
-  document.getElementById("locationForm").reset();
-
-  openModal("locationModal");
-}
-
-document.getElementById("locationForm").addEventListener("submit",e=>{
-
-  e.preventDefault();
-
-  const name=document.getElementById("locationName").value.trim();
-  const description=document.getElementById("locationDescription").value.trim();
-
-  if(!name){
-    toast("Introduza o nome da localização.","error");
-    return;
-  }
-
-  state.locations.push({
-    id:uid("loc"),
-    name,
-    description
-  });
-
-  saveState();
-
-  closeModal("locationModal");
-
-  toast("Localização criada.","success");
-
-  renderCurrentPage();
-});
-
-function renderLocations(){
-
-  const box=document.getElementById("locationsGrid");
-
-  if(!state.locations.length){
-    box.innerHTML=`
-      <div class="card" style="grid-column:1/-1">
-        <div class="empty">Sem localizações.</div>
-      </div>`;
-    return;
-  }
-
-  box.innerHTML=state.locations.map(loc=>{
-
-    const products=state.products.filter(p=>p.locationId===loc.id);
-
-    const quantity=products.reduce(
-      (s,p)=>s+Number(p.quantity||0),0
-    );
-
-    const value=products.reduce(
-      (s,p)=>s+Number(p.quantity||0)*Number(p.cost||0),0
-    );
-
-    return `
-      <div class="card location-card">
-
-        <div style="font-size:25px;margin-bottom:10px">🏭</div>
-
-        <h3>${esc(loc.name)}</h3>
-
-        <p>${esc(loc.description||"Sem descrição")}</p>
-
-        <div class="location-meta">
-
-          <span>
-            <strong>${products.length}</strong> artigos
-          </span>
-
-          <span>
-            <strong>${numberPT(quantity)}</strong> unidades
-          </span>
-
-        </div>
-
-        <div style="margin-top:12px;font-size:12px;color:#64748b">
-          Valor: <strong>${money(value)}</strong>
-        </div>
-
-        <button
-          class="btn btn-outline btn-sm"
-          style="margin-top:14px"
-          onclick="filterLocation('${loc.id}')">
-          Ver artigos
-        </button>
-
-        <button
-          class="btn btn-danger btn-sm"
-          style="margin-top:5px"
-          onclick="deleteLocation('${loc.id}')">
-          Eliminar
-        </button>
-
-      </div>
-    `;
-
-  }).join("");
-}
-
-function filterLocation(id){
-
-  const loc=getLocation(id);
-  navigate("products");
-
-  setTimeout(()=>{
-    document.getElementById("productLocationFilter").value=loc?.name || "";
-    renderProducts();
-  },50);
-}
-
-function deleteLocation(id){
-
-  const used=state.products.some(p=>p.locationId===id);
-
-  if(used){
-    toast("Não é possível eliminar uma localização com artigos.","error");
-    return;
-  }
-
-  const loc=getLocation(id);
-
-  if(!confirm(`Eliminar "${loc?.name}"?`)) return;
-
-  state.locations=state.locations.filter(l=>l.id!==id);
-
-  saveState();
-
-  toast("Localização eliminada.","success");
-
-  renderCurrentPage();
-}
-
-
-/* =========================================================
-   CATEGORIES
-   ========================================================= */
-
-let categoryOpenedFromProduct = false;
-
-function openCategoryModal(fromProduct=false){
-
-  categoryOpenedFromProduct = !!fromProduct;
-  document.getElementById("categoryForm").reset();
-
-  openModal("categoryModal");
-}
-
-document.getElementById("categoryForm").addEventListener("submit",e=>{
-
-  e.preventDefault();
-
-  const name=document.getElementById("categoryName").value.trim();
-
-  if(!name){
-    toast("Introduza o nome da categoria.","error");
-    return;
-  }
-
-  if(state.categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){
-    toast("Essa categoria já existe.","warning");
-    return;
-  }
-
-  const newCategory={
-    id:uid("cat"),
-    name
-  };
-
-  state.categories.push(newCategory);
-
-  saveState();
-
-  closeModal("categoryModal");
-
-  // Atualiza imediatamente a lista de categorias dentro de Nova joia.
-  renderSelects();
-  const productCategory=document.getElementById("productCategory");
-  if(categoryOpenedFromProduct && productCategory){
-    productCategory.value=newCategory.id;
-  }
-  categoryOpenedFromProduct=false;
-
-  toast("Categoria criada.","success");
-
-  renderCurrentPage();
-});
-
-function renderCategories(){
-
-  const tbody=document.getElementById("categoriesTable");
-
-  if(!state.categories.length){
-
-    tbody.innerHTML=`
-      <tr>
-        <td colspan="5">
-          <div class="empty">Sem categorias.</div>
-        </td>
-      </tr>`;
-
-    return;
-  }
-
-  tbody.innerHTML=state.categories.map(cat=>{
-
-    const products=state.products.filter(
-      p=>p.categoryId===cat.id
-    );
-
-    const quantity=products.reduce(
-      (s,p)=>s+Number(p.quantity||0),0
-    );
-
-    const value=products.reduce(
-      (s,p)=>s+Number(p.quantity||0)*Number(p.cost||0),0
-    );
-
-    return `
-      <tr>
-
-        <td>
-          <strong>${esc(cat.name)}</strong>
-        </td>
-
-        <td>${products.length}</td>
-
-        <td>${numberPT(quantity)}</td>
-
-        <td>${money(value)}</td>
-
-        <td>
-          <button
-            class="action"
-            onclick="deleteCategory('${cat.id}')">
-            🗑️
-          </button>
-        </td>
-
-      </tr>
-    `;
-
-  }).join("");
-}
-
-function deleteCategory(id){
-
-  const used=state.products.some(p=>p.categoryId===id);
-
-  if(used){
-    toast("Não é possível eliminar uma categoria que tem artigos.","error");
-    return;
-  }
-
-  const cat=getCategory(id);
-
-  if(!confirm(`Eliminar "${cat?.name}"?`)) return;
-
-  state.categories=state.categories.filter(c=>c.id!==id);
-
-  saveState();
-
-  toast("Categoria eliminada.","success");
-
-  renderCurrentPage();
-}
-
-
-/* =========================================================
-   IMPORTAÇÃO CSV
-   ========================================================= */
-
-function parseCSV(text){
-
-  const rows=[];
-  let row=[];
-  let value="";
-  let quoted=false;
-
-  for(let i=0;i<text.length;i++){
-
-    const char=text[i];
-    const next=text[i+1];
-
-    if(char==='"'){
-
-      if(quoted && next==='"'){
-        value+='"';
-        i++;
-      }else{
-        quoted=!quoted;
-      }
-
-    }else if(char==="," && !quoted){
-
-      row.push(value);
-      value="";
-
-    }else if((char==="\n" || char==="\r") && !quoted){
-
-      if(char==="\r" && next==="\n") i++;
-
-      row.push(value);
-      value="";
-
-      if(row.some(x=>x.trim()!=="")){
-        rows.push(row);
-      }
-
-      row=[];
-
-    }else{
-
-      value+=char;
-    }
-  }
-
-  if(value!=="" || row.length){
-    row.push(value);
-
-    if(row.some(x=>x.trim()!=="")){
-      rows.push(row);
-    }
-  }
-
-  return rows;
-}
-
-function importCSV(){
-
-  const input=document.getElementById("csvFile");
-
-  if(!input.files.length){
-    toast("Selecione um ficheiro CSV.","warning");
-    return;
-  }
-
-  const file=input.files[0];
-
-  const reader=new FileReader();
-
-  reader.onload=()=>{
-
-    try{
-
-      const rows=parseCSV(reader.result);
-
-      if(rows.length<2){
-        throw new Error("CSV vazio");
-      }
-
-      const headers=rows[0].map(h=>
-        h.trim().toLowerCase()
-      );
-
-      let imported=0;
-
-      for(let i=1;i<rows.length;i++){
-
-        const row=rows[i];
-
-        const obj={};
-
-        headers.forEach((h,index)=>{
-          obj[h]=(row[index]||"").trim();
-        });
-
-        if(!obj.nome) continue;
-
-        let categoryId="";
-
-        if(obj.categoria){
-
-          let category=state.categories.find(
-            c=>c.name.toLowerCase()===obj.categoria.toLowerCase()
-          );
-
-          if(!category){
-
-            category={
-              id:uid("cat"),
-              name:obj.categoria
-            };
-
-            state.categories.push(category);
-          }
-
-          categoryId=category.id;
-        }
-
-        let locationId="";
-        const locationName=String(obj.localizacao||"").trim();
-
-        if(locationName){
-
-          let location=state.locations.find(
-            l=>l.name.toLowerCase()===locationName.toLowerCase()
-          );
-
-          if(!location){
-
-            location={
-              id:uid("loc"),
-              name:locationName,
-              description:""
-            };
-
-            state.locations.push(location);
-          }
-
-          locationId=location.id;
-        }
-
-        const product={
-          id:uid("prod"),
-          name:obj.nome,
-          categoryId,
-          locationId,
-          locationName,
-          quantity:parseNumber(obj.quantidade),
-          minStock:parseNumber(obj.stock_minimo),
-          price:parseNumber(obj.preco),
-          cost:parseNumber(obj.custo),
-          unit:obj.unidade||"un",
-          description:obj.descricao||"",
-          createdAt:new Date().toISOString()
+    const synth = window.speechSynthesis;
+
+    function falarEspanhol(texto, card, autoReturn = true) {
+      if (synth.speaking) synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(texto);
+      utterance.lang = 'es-ES';
+      utterance.rate = 0.88;
+
+      if (autoReturn) {
+        let jaVoltou = false;
+        const voltar = () => {
+          if (jaVoltou) return;
+          jaVoltou = true;
+          card.classList.remove("flipped");
         };
-
-        state.products.push(product);
-
-        imported++;
+        utterance.onend = () => setTimeout(voltar, 1200);
+        utterance.onerror = () => setTimeout(voltar, 1200);
+        const tempoMaximo = Math.max(1800, texto.length * 110) + 1200;
+        setTimeout(voltar, tempoMaximo);
       }
 
-      saveState();
-
-      toast(`${imported} joias importadas.`,"success");
-
-      input.value="";
-
-      navigate("products");
-
-    }catch(error){
-
-      console.error(error);
-
-      toast(
-        "Não foi possível ler o ficheiro CSV.",
-        "error"
-      );
+      synth.speak(utterance);
     }
-  };
 
-  reader.readAsText(file,"UTF-8");
-}
-
-function parseNumber(value){
-
-  if(value===undefined || value===null || value===""){
-    return 0;
-  }
-
-  let s=String(value).trim();
-
-  /*
-    Aceita:
-    12
-    12.50
-    12,50
-    1.234,50
-  */
-
-  if(s.includes(",") && s.includes(".")){
-    s=s.replace(/\./g,"").replace(",",".");
-  }else if(s.includes(",")){
-    s=s.replace(",",".");
-  }
-
-  s=s.replace(/[^\d.-]/g,"");
-
-  return Number(s)||0;
-}
-
-
-/* =========================================================
-   EXPORTAÇÃO CSV
-   ========================================================= */
-
-function csvEscape(value){
-
-  const s=String(value??"");
-
-  if(/[",\n\r]/.test(s)){
-    return '"' + s.replace(/"/g,'""') + '"';
-  }
-
-  return s;
-}
-
-function downloadFile(filename,content,type="text/csv;charset=utf-8"){
-
-  const blob=new Blob(
-    ["\uFEFF"+content],
-    {type}
-  );
-
-  const url=URL.createObjectURL(blob);
-
-  const a=document.createElement("a");
-
-  a.href=url;
-  a.download=filename;
-
-  document.body.appendChild(a);
-
-  a.click();
-
-  a.remove();
-
-  URL.revokeObjectURL(url);
-}
-
-function exportProductsCSV(){
-
-  const headers=[
-    "nome",
-    "localizacao",
-    "quantidade",
-    "stock_minimo",
-    "preco",
-    "custo",
-    "unidade",
-    "descricao"
-  ];
-
-  const lines=[headers.join(",")];
-
-  state.products.forEach(p=>{
-
-    lines.push([
-      p.name,
-      getCategory(p.categoryId)?.name||"",
-      p.locationName || getLocation(p.locationId)?.name || "",
-      p.quantity,
-      p.minStock,
-      p.price,
-      p.cost,
-      p.unit,
-      p.description
-    ].map(csvEscape).join(","));
-
-  });
-
-  downloadFile(
-    "stockpt_artigos.csv",
-    lines.join("\r\n")
-  );
-
-  toast("Artigos exportados.","success");
-}
-
-function exportMovementsCSV(){
-
-  const headers=[
-    "data",
-    "tipo",
-    "artigo",
-    "quantidade",
-    "valor_total",
-    "gastos",
-    "lucro",
-    "localizacao",
-    "utilizador",
-    "observacao"
-  ];
-
-  const lines=[headers.join(",")];
-
-  state.movements.forEach(m=>{
-
-    const p=getProduct(m.productId);
-    const l=getLocation(m.locationId);
-
-    lines.push([
-      dateTime(m.date),
-      movementLabel(m.type),
-      p?.name||"",
-      m.quantity,
-      m.totalValue ?? (Number(m.quantity||0)*Number(m.unitPrice||0)),
-      m.expenseValue ?? (m.type==="entrada" ? Number(m.quantity||0)*Number(m.unitCost ?? p?.cost ?? 0) : 0),
-      m.profitValue ?? (m.type==="saida" ? Number(m.quantity||0)*(Number(m.unitPrice ?? p?.price ?? 0)-Number(m.unitCost ?? p?.cost ?? 0)) : 0),
-      m.locationName || l?.name||"",
-      m.user||"",
-      m.note||""
-    ].map(csvEscape).join(","));
-
-  });
-
-  downloadFile(
-    "stockpt_movimentos.csv",
-    lines.join("\r\n")
-  );
-
-  toast("Movimentos exportados.","success");
-}
-
-function exportInventoryCSV(){
-
-  const headers=[
-    "nome",
-    "data",
-    "localizacao",
-    "estado"
-  ];
-
-  const lines=[headers.join(",")];
-
-  state.inventories.forEach(inv=>{
-
-    lines.push([
-      inv.name,
-      inv.date,
-      inv.locationName || getLocation(inv.locationId)?.name||"",
-      inv.status
-    ].map(csvEscape).join(","));
-
-  });
-
-  downloadFile(
-    "stockpt_inventarios.csv",
-    lines.join("\r\n")
-  );
-
-  toast("Inventários exportados.","success");
-}
-
-function downloadTemplate(){
-
-  const headers=[
-    "nome",
-    "localizacao",
-    "quantidade",
-    "stock_minimo",
-    "preco",
-    "custo",
-    "unidade",
-    "descricao"
-  ];
-
-  const example=[
-    "Produto exemplo",
-    "Localização",
-    "10",
-    "5",
-    "12,50",
-    "8,00",
-    "un",
-    "Descrição"
-  ];
-
-  downloadFile(
-    "modelo_stockpt.csv",
-    headers.join(",")+"\r\n"+
-    example.map(csvEscape).join(",")
-  );
-
-  toast("Modelo descarregado.","success");
-}
-
-
-/* =========================================================
-   BACKUP
-   ========================================================= */
-
-function backupData(){
-
-  const backup={
-    application:"StockPT",
-    version:1,
-    exportedAt:new Date().toISOString(),
-    data:state
-  };
-
-  const content=JSON.stringify(
-    backup,
-    null,
-    2
-  );
-
-  downloadFile(
-    "stockpt_backup_"+todayInput()+".json",
-    content,
-    "application/json"
-  );
-
-  toast("Backup criado.","success");
-}
-
-function restoreBackup(event){
-
-  const file=event.target.files[0];
-
-  if(!file) return;
-
-  const reader=new FileReader();
-
-  reader.onload=()=>{
-
-    try{
-
-      const backup=JSON.parse(reader.result);
-
-      if(!backup.data){
-        throw new Error("Backup inválido");
+    // FUNÇÃO DE TRADUÇÃO USANDO GOOGLE TRANSLATE
+    async function traduzirParaEspanhol(texto) {
+      if (!texto || texto.trim() === '') return texto;
+      
+      const textoLimpo = texto.trim();
+      
+      try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=pt&tl=es&dt=t&q=${encodeURIComponent(textoLimpo)}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data && data[0] && data[0][0] && data[0][0][0]) {
+          const traducao = data[0][0][0];
+          return traducao.charAt(0).toUpperCase() + traducao.slice(1);
+        }
+      } catch (error) {
+        console.error('Erro na tradução via Google:', error);
       }
+      
+      return textoLimpo.charAt(0).toUpperCase() + textoLimpo.slice(1);
+    }
 
-      if(!confirm(
-        "Restaurar este backup vai substituir os dados atuais. Continuar?"
-      )){
+    function renderApp() {
+      const tabsContainer = document.getElementById('tabs-container');
+      const wrapper = document.getElementById('grids-wrapper');
+      
+      tabsContainer.innerHTML = "";
+      wrapper.innerHTML = "";
+
+      const keysPadrao = Object.keys(catalogosPadrao);
+      const todasKeys = keysPadrao.concat(categoriasCustomizadas);
+
+      todasKeys.forEach((catKey) => {
+        const isCustomCat = categoriasCustomizadas.includes(catKey);
+        
+        const dadosPadrao = catalogosPadrao[catKey] ? catalogosPadrao[catKey].data : [];
+        const cardsMovidos = customCards.filter(c => c.categoriaDestino === catKey);
+        const todosOsCards = [...dadosPadrao, ...cardsMovidos];
+
+        const nomeCat = catalogosPadrao[catKey] ? catalogosPadrao[catKey].nome : catKey;
+
+        const btn = document.createElement('button');
+        btn.className = `tab-btn ${currentActiveTab === catKey ? 'active' : ''}`;
+        
+        let deleteBtnHtml = isCustomCat 
+          ? `<span class="btn-delete-cat" title="Excluir este catálogo" onclick="excluirCategoriaCustomizada('${catKey}', event)">✕</span>` 
+          : '';
+
+        btn.innerHTML = `<span>${nomeCat} (${todosOsCards.length})</span>${deleteBtnHtml}`;
+        btn.onclick = (e) => {
+          if (!e.target.classList.contains('btn-delete-cat')) {
+            switchCategory(catKey);
+          }
+        };
+        tabsContainer.appendChild(btn);
+
+        const grid = document.createElement('div');
+        grid.id = `grid-${catKey}`;
+        grid.className = `grid-container ${currentActiveTab === catKey ? '' : 'hidden'}`;
+        wrapper.appendChild(grid);
+
+        renderGridData(todosOsCards, grid.id, catKey);
+      });
+
+      // Botão da Lixeira
+      const btnLixeira = document.createElement('button');
+      btnLixeira.className = `tab-btn lixeira ${currentActiveTab === 'lixeira' ? 'active' : ''}`;
+      btnLixeira.innerText = `🗑️ Lixeira (${lixeira.length})`;
+      btnLixeira.onclick = () => switchCategory('lixeira');
+      tabsContainer.appendChild(btnLixeira);
+
+      // Grid da Lixeira
+      const gridLixeira = document.createElement('div');
+      gridLixeira.id = 'grid-lixeira';
+      gridLixeira.className = `grid-container ${currentActiveTab === 'lixeira' ? '' : 'hidden'}`;
+      wrapper.appendChild(gridLixeira);
+
+      const btnCustom = document.createElement('button');
+      btnCustom.className = `tab-btn ${currentActiveTab === 'custom' ? 'active' : ''}`;
+      btnCustom.innerText = `Personalizado ✨ (${customCards.filter(c => !c.categoriaDestino).length})`;
+      btnCustom.onclick = () => switchCategory('custom');
+      tabsContainer.appendChild(btnCustom);
+
+      switchCategory(currentActiveTab);
+    }
+
+    function renderGridData(data, containerId, catKey) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = "";
+      const fragment = document.createDocumentFragment();
+
+      if (catKey === 'lixeira') {
+        if (data.length === 0) {
+          const vazio = document.createElement('div');
+          vazio.className = 'lixeira-vazia';
+          vazio.innerHTML = '🗑️ Lixeira vazia<br><span style="font-size: 14px;">Os cards excluídos aparecerão aqui</span>';
+          fragment.appendChild(vazio);
+        } else {
+          data.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            let restoreBtn = `<button class="btn-restore-card" onclick="restaurarCardDaLixeira(${item.id}, event)" title="Restaurar">↩️</button>`;
+            let deletePermanentBtn = `<button class="btn-delete-permanent" onclick="excluirPermanentementeDaLixeira(${item.id}, event)" title="Excluir Permanentemente">✕</button>`;
+
+            let frontContent = `<div class="main-title">${item.ptMain}</div>`;
+            let backMedia = `<div class="visual">${item.visual || '✨'}</div>`;
+
+            card.innerHTML = `
+              <div class="card-inner">
+                <div class="card-front">
+                  ${restoreBtn}
+                  ${deletePermanentBtn}
+                  ${frontContent}
+                </div>
+                <div class="card-back">
+                  ${restoreBtn}
+                  ${deletePermanentBtn}
+                  ${backMedia}
+                  <div class="es-text">${item.es}</div>
+                </div>
+              </div>
+            `;
+
+            card.addEventListener("click", () => {
+              const isFlipped = card.classList.toggle("flipped");
+              if (isFlipped) falarEspanhol(item.es, card, true);
+            });
+
+            fragment.appendChild(card);
+          });
+        }
+        container.appendChild(fragment);
         return;
       }
 
-      state=backup.data;
+      // Catálogos padrão - CORES não tem botão de excluir
+      const catalogoPermiteExcluir = ['objetos', 'animais', 'alimentos', 'roupas', 'corpo', 'transportes'];
 
-      saveState();
+      data.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
 
-      toast("Backup restaurado.","success");
+        let deleteBtn = '';
+        if (catalogoPermiteExcluir.includes(catKey)) {
+          if (item.id) {
+            deleteBtn = `<button class="btn-delete-card" onclick="excluirCardPersonalizadoDoCatalogo(${item.id}, '${catKey}', event)">✕</button>`;
+          } else {
+            deleteBtn = `<button class="btn-delete-card" onclick="excluirCardDoCatalogo('${catKey}', '${item.es}', event)">✕</button>`;
+          }
+        }
 
-      navigate("dashboard");
+        let cardActions = item.id ? `
+          <div class="card-actions">
+            <button class="btn-action" title="Editar Nome" onclick="editCardName(${item.id}, event)">✏️</button>
+            <button class="btn-action" title="Excluir Card" onclick="deleteCustomCard(${item.id}, event)">✕</button>
+          </div>
+        ` : '';
 
-    }catch(e){
+        let fotoBtn = item.id ? `<div class="btn-foto-pill" onclick="uploadPhotoForCard(${item.id}, event)">📷 Foto</div>` : '';
 
-      console.error(e);
+        let frontContent = "";
+        if (item.imageOnlyFront) {
+          frontContent = `<div class="visual-front">${item.visual}</div>`;
+        } else if (item.image) {
+          frontContent = `<img src="${item.image}" class="card-img-large">`;
+        } else {
+          frontContent = `<div class="main-title">${item.ptMain}</div>`;
+        }
 
-      toast("Backup inválido.","error");
+        let backMedia = item.image 
+          ? `<img src="${item.image}" class="card-img-large">` 
+          : `<div class="visual">${item.visual || '✨'}</div>`;
+
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">
+              ${cardActions}
+              ${deleteBtn}
+              ${frontContent}
+              ${fotoBtn}
+            </div>
+            <div class="card-back">
+              ${cardActions}
+              ${deleteBtn}
+              ${backMedia}
+              <div class="es-text">${item.es}</div>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener("click", () => {
+          const isFlipped = card.classList.toggle("flipped");
+          if (isFlipped) falarEspanhol(item.es, card, true);
+        });
+
+        fragment.appendChild(card);
+      });
+
+      container.appendChild(fragment);
     }
 
-    event.target.value="";
-  };
-
-  reader.readAsText(file);
-}
-
-
-/* =========================================================
-   DELETE INVENTORY
-   ========================================================= */
-
-function deleteInventory(id){
-
-  const inv=state.inventories.find(i=>i.id===id);
-
-  if(!inv) return;
-
-  if(!confirm(`Eliminar o inventário "${inv.name}"?`)) return;
-
-  state.inventories=state.inventories.filter(i=>i.id!==id);
-
-  saveState();
-
-  toast("Inventário eliminado.","success");
-
-  renderInventories();
-}
-
-
-/* =========================================================
-   MODAIS
-   ========================================================= */
-
-function openModal(id){
-  document.getElementById(id).classList.remove("hidden");
-}
-
-function closeModal(id){
-  document.getElementById(id).classList.add("hidden");
-}
-
-document.querySelectorAll(".modal").forEach(modal=>{
-
-  modal.addEventListener("click",e=>{
-
-    if(e.target===modal){
-      modal.classList.add("hidden");
+    function excluirCardDoCatalogo(catKey, esValue, event) {
+      event.stopPropagation();
+      if (confirm(`Deseja excluir o card "${esValue}" do catálogo ${catKey}?`)) {
+        const catalogo = catalogosPadrao[catKey];
+        if (catalogo) {
+          const index = catalogo.data.findIndex(item => item.es === esValue);
+          if (index !== -1) {
+            const cardRemovido = catalogo.data[index];
+            lixeira.push({ 
+              ...cardRemovido, 
+              id: Date.now() + Math.random(),
+              origem: catKey,
+              tipo: 'padrao',
+              posicao: index
+            });
+            localStorage.setItem('lixeira_flashcards', JSON.stringify(lixeira));
+            catalogo.data.splice(index, 1);
+            renderApp();
+          }
+        }
+      }
     }
 
-  });
-
-});
-
-
-/* =========================================================
-   HELPERS
-   ========================================================= */
-
-function getProduct(id){
-  return state.products.find(p=>p.id===id);
-}
-
-function getLocation(id){
-  return state.locations.find(l=>l.id===id);
-}
-
-function getRecordLocationName(record){
-  return record?.locationName || getLocation(record?.locationId)?.name || "";
-}
-
-function getCategory(id){
-  return state.categories.find(c=>c.id===id);
-}
-
-function movementLabel(type){
-
-  const labels={
-    entrada:"Entrada",
-    saida:"Saída",
-    ajuste:"Ajuste",
-    transferencia:"Transferência",
-    inventario:"Inventário"
-  };
-
-  return labels[type]||type;
-}
-
-
-const settingsCurrency=document.getElementById("settingsCurrency");
-const settingsCountry=document.getElementById("settingsCountry");
-if(settingsCurrency) settingsCurrency.addEventListener("change",saveSettingsFromUI);
-if(settingsCountry) settingsCountry.addEventListener("change",saveSettingsFromUI);
-
-/* =========================================================
-   PESQUISA
-   ========================================================= */
-
-document.getElementById("productSearch")
-  .addEventListener("input",()=>{
-    renderProducts();
-  });
-
-
-document.getElementById("productLocationFilter")
-  .addEventListener("change",()=>{
-    renderProducts();
-  });
-
-document.getElementById("movementSearch")
-  .addEventListener("input",()=>{
-    renderMovements();
-  });
-
-document.getElementById("movementTypeFilter")
-  .addEventListener("change",()=>{
-    renderMovements();
-  });
-
-
-/* =========================================================
-   SELEÇÃO/PESQUISA DE ARTIGOS
-   ========================================================= */
-
-const movementProductSearch=document.getElementById("movementProductSearch");
-const movementProductOptions=document.getElementById("movementProductOptions");
-
-if(movementProductSearch){
-  movementProductSearch.addEventListener("focus",()=>renderMovementProductOptions(movementProductSearch.value));
-  movementProductSearch.addEventListener("input",()=>{
-    const typed=movementProductSearch.value.toLowerCase().trim();
-    const exact=state.products.find(p=>formatProductChoice(p).toLowerCase()===typed);
-    if(exact) selectMovementProduct(exact.id);
-    else document.getElementById("movementProduct").value="";
-    renderMovementProductOptions(movementProductSearch.value);
-    updateMovementTotal();
-    updateMovementProductHint();
-  });
-  movementProductSearch.addEventListener("keydown",e=>{
-    if(e.key==="ArrowDown"){
-      e.preventDefault();
-      const first=movementProductOptions?.querySelector(".searchable-option");
-      if(first) first.classList.add("active");
+    function excluirCardPersonalizadoDoCatalogo(id, catKey, event) {
+      event.stopPropagation();
+      const card = customCards.find(c => c.id === id);
+      if (!card) return;
+      
+      if (confirm(`Deseja excluir o card "${card.ptMain}" do catálogo ${catKey}?`)) {
+        lixeira.push({ 
+          ...card, 
+          origem: catKey,
+          tipo: 'personalizado'
+        });
+        localStorage.setItem('lixeira_flashcards', JSON.stringify(lixeira));
+        customCards = customCards.filter(c => c.id !== id);
+        saveAndRenderCustom();
+        renderApp();
+        switchCategory(catKey);
+      }
     }
-    if(e.key==="Enter"){
-      const first=movementProductOptions?.querySelector(".searchable-option");
-      if(first){e.preventDefault();selectMovementProduct(first.dataset.productId);}
+
+    function restaurarCardDaLixeira(id, event) {
+      event.stopPropagation();
+      const index = lixeira.findIndex(item => item.id === id);
+      if (index === -1) return;
+      
+      const card = lixeira[index];
+      if (confirm(`Deseja restaurar o card "${card.ptMain}"?`)) {
+        lixeira.splice(index, 1);
+        localStorage.setItem('lixeira_flashcards', JSON.stringify(lixeira));
+        
+        if (card.tipo === 'personalizado') {
+          const novoCard = { ...card };
+          delete novoCard.origem;
+          delete novoCard.tipo;
+          delete novoCard.id;
+          novoCard.id = Date.now();
+          customCards.push(novoCard);
+          saveAndRenderCustom();
+        } else if (card.tipo === 'padrao') {
+          const catKey = card.origem || 'objetos';
+          const catalogo = catalogosPadrao[catKey];
+          if (catalogo) {
+            const novoCard = { ...card };
+            delete novoCard.origem;
+            delete novoCard.tipo;
+            delete novoCard.id;
+            delete novoCard.posicao;
+            
+            const pos = card.posicao || 0;
+            if (pos < catalogo.data.length) {
+              catalogo.data.splice(pos, 0, novoCard);
+            } else {
+              catalogo.data.push(novoCard);
+            }
+          }
+        }
+        renderApp();
+        switchCategory('lixeira');
+      }
     }
-    if(e.key==="Escape") movementProductOptions?.classList.remove("open");
-  });
-}
 
-if(movementProductOptions){
-  movementProductOptions.addEventListener("click",e=>{
-    const option=e.target.closest(".searchable-option");
-    if(option) selectMovementProduct(option.dataset.productId);
-  });
-}
+    function excluirPermanentementeDaLixeira(id, event) {
+      event.stopPropagation();
+      const card = lixeira.find(item => item.id === id);
+      if (!card) return;
+      
+      if (confirm(`Deseja excluir PERMANENTEMENTE o card "${card.ptMain}"? Esta ação não pode ser desfeita!`)) {
+        lixeira = lixeira.filter(item => item.id !== id);
+        localStorage.setItem('lixeira_flashcards', JSON.stringify(lixeira));
+        renderApp();
+        switchCategory('lixeira');
+      }
+    }
 
-document.getElementById("movementQuantity")?.addEventListener("input",updateMovementTotal);
+    function verificarDuplicado(nome, idIgnorar = null) {
+      const nomeLower = nome.trim().toLowerCase();
+      
+      const todosCards = customCards.filter(c => c.id !== idIgnorar);
+      const existe = todosCards.some(c => c.ptMain.toLowerCase() === nomeLower);
+      
+      if (existe) {
+        return confirm(`⚠️ Já existe um card com o nome "${nome.trim()}"!\n\nDeseja criar mesmo assim?`);
+      }
+      return true;
+    }
 
-document.addEventListener("click",e=>{
-  const picker=document.getElementById("movementProductPicker");
-  if(picker && !picker.contains(e.target)) document.getElementById("movementProductOptions")?.classList.remove("open");
-});
+    async function addCustomCard() {
+      const nameInput = document.getElementById('custom-input-name');
+      const ptName = nameInput.value.trim();
 
-/* =========================================================
-   TECLADO
-   ========================================================= */
+      if (!ptName) return alert("Escreva o nome em Português.");
 
-document.addEventListener("keydown",e=>{
+      const permitir = verificarDuplicado(ptName);
+      if (!permitir) return;
 
-  if(e.key==="Escape"){
+      const esName = await traduzirParaEspanhol(ptName);
 
-    document.querySelectorAll(".modal").forEach(m=>{
-      m.classList.add("hidden");
-    });
+      const newCard = {
+        id: Date.now(),
+        ptMain: ptName,
+        es: esName,
+        visual: '✨',
+        image: "",
+        categoriaDestino: ""
+      };
 
-  }
+      customCards.push(newCard);
+      saveAndRenderCustom();
+      renderApp();
+      switchCategory('custom');
+      nameInput.value = "";
+    }
 
-});
+    function criarNovaCategoria() {
+      const input = document.getElementById('custom-cat-name');
+      const nome = input.value.trim();
 
+      if (!nome) return alert("Escreva o nome do catálogo.");
+      if (categoriasCustomizadas.includes(nome) || catalogosPadrao[nome]) {
+        return alert("Catálogo já existe.");
+      }
 
-/* =========================================================
-   SETTINGS
-   ========================================================= */
+      categoriasCustomizadas.push(nome);
+      localStorage.setItem('cat_customizadas', JSON.stringify(categoriasCustomizadas));
+      input.value = "";
+      renderApp();
+      saveAndRenderCustom();
+      switchCategory('custom');
+    }
 
-document.getElementById("localStorageSwitch")
-  .addEventListener("click",function(){
+    function excluirCategoriaCustomizada(catNome, event) {
+      event.stopPropagation();
+      if (confirm(`Tem certeza que deseja excluir o catálogo "${catNome}"? Os cards deste catálogo serão excluídos também.`)) {
+        categoriasCustomizadas = categoriasCustomizadas.filter(c => c !== catNome);
+        localStorage.setItem('cat_customizadas', JSON.stringify(categoriasCustomizadas));
 
-    this.classList.toggle("on");
+        const cardsParaExcluir = customCards.filter(c => c.categoriaDestino === catNome);
+        cardsParaExcluir.forEach(card => {
+          lixeira.push({ ...card, origem: catNome, tipo: 'personalizado' });
+        });
+        localStorage.setItem('lixeira_flashcards', JSON.stringify(lixeira));
 
-    toast(
-      this.classList.contains("on")
-        ? "Armazenamento local ativado."
-        : "Armazenamento local desativado.",
-      "success"
-    );
-  });
+        customCards = customCards.filter(c => c.categoriaDestino !== catNome);
 
+        saveAndRenderCustom();
+        renderApp();
+        switchCategory('custom');
+      }
+    }
 
-/* =========================================================
-   CLEAR DATA
-   ========================================================= */
+    function moverCard(id, destino, event) {
+      event.stopPropagation();
+      const card = customCards.find(c => c.id === id);
+      if (card) {
+        card.categoriaDestino = destino;
+        saveAndRenderCustom();
+        renderApp();
+        switchCategory('custom');
+      }
+    }
 
-function clearAllData(){
+    function deleteCustomCard(id, event) {
+      event.stopPropagation();
+      const card = customCards.find(c => c.id === id);
+      if (!card) return;
+      
+      if (confirm(`Deseja excluir o card "${card.ptMain}"?`)) {
+        lixeira.push({ ...card, tipo: 'personalizado' });
+        localStorage.setItem('lixeira_flashcards', JSON.stringify(lixeira));
+        customCards = customCards.filter(c => c.id !== id);
+        saveAndRenderCustom();
+        renderApp();
+      }
+    }
 
-  const confirmation=prompt(
-    'Para eliminar todos os dados escreva: ELIMINAR'
-  );
+    async function editCardName(id, event) {
+      event.stopPropagation();
+      const card = customCards.find(c => c.id === id);
+      if (!card) return;
+      const novoNome = prompt("Novo nome em Português:", card.ptMain);
+      if (novoNome === null) return;
+      const nomeTrim = novoNome.trim();
+      if (!nomeTrim) return;
+      
+      const permitir = verificarDuplicado(nomeTrim, id);
+      if (!permitir) return;
+      
+      card.ptMain = nomeTrim;
+      card.es = await traduzirParaEspanhol(nomeTrim);
+      saveAndRenderCustom();
+      renderApp();
+    }
 
-  if(confirmation!=="ELIMINAR"){
-    toast("Operação cancelada.","warning");
-    return;
-  }
+    function uploadPhotoForCard(id, event) {
+      event.stopPropagation();
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = evt => {
+            const card = customCards.find(c => c.id === id);
+            if (card) {
+              card.image = evt.target.result;
+              saveAndRenderCustom();
+              renderApp();
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      input.click();
+    }
 
-  localStorage.removeItem(STORAGE_KEY);
+    function saveAndRenderCustom() {
+      localStorage.setItem('custom_flashcards', JSON.stringify(customCards));
+      renderCustomGrid();
+    }
 
-  seedData();
+    function toggleMenu(id, event) {
+      event.stopPropagation();
+      const menu = document.getElementById(`menu-${id}`);
+      menu.classList.toggle('hidden');
+    }
 
-  saveState();
+    function renderCustomGrid() {
+      const container = document.getElementById('grid-custom');
+      if (!container) return;
+      container.innerHTML = "";
+      const fragment = document.createDocumentFragment();
 
-  toast("Dados reinicializados.","success");
+      const unassignedCards = customCards.filter(c => !c.categoriaDestino);
 
-  navigate("dashboard");
-}
+      const todosCatalogos = Object.keys(catalogosPadrao).concat(categoriasCustomizadas);
 
+      unassignedCards.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card card-large";
 
-/* =========================================================
-   INIT
-   ========================================================= */
+        let mediaFront = item.image 
+          ? `<img src="${item.image}" class="card-img-large" style="margin-top: 2px; width:75px; height:75px; object-fit:cover; border-radius:10px; border:2px solid #ffffff; box-shadow:0 2px 5px rgba(0,0,0,0.2);">` 
+          : `<div class="main-title" style="font-size: 16px; margin-bottom: 2px;">${item.ptMain}</div><div class="photo-btn-placeholder-large" onclick="uploadPhotoForCard(${item.id}, event)"><span>📷</span><span>Add Foto</span></div>`;
 
-function init(){
+        let mediaBack = item.image 
+          ? `<img src="${item.image}" class="card-img-large" style="width:75px; height:75px; object-fit:cover; border-radius:10px; border:2px solid #ffffff; box-shadow:0 2px 5px rgba(0,0,0,0.2);">` 
+          : `<div class="visual">${item.visual || '✨'}</div>`;
 
-  loadState();
-  state.settings.currency="EUR";
-  saveState();
+        let opcoesDestino = todosCatalogos.map(catKey => {
+          const catNome = catalogosPadrao[catKey] ? catalogosPadrao[catKey].nome : catKey;
+          return `<button onclick="moverCard(${item.id}, '${catKey}', event)">➔ ${catNome}</button>`;
+        }).join('');
 
-  renderSettingsOptions();
-  renderSelects();
-  document.documentElement.lang="pt-PT";
-  document.documentElement.dir="ltr";
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">
+              ${mediaFront}
+              <div class="btn-foto-pill" onclick="uploadPhotoForCard(${item.id}, event)">✏️ Foto</div>
+            </div>
+            <div class="card-back">
+              <div class="card-actions">
+                <button class="btn-action" title="Editar Nome" onclick="editCardName(${item.id}, event)">✏️</button>
+                <button class="btn-action" title="Mover Card" onclick="toggleMenu(${item.id}, event)">☰</button>
+                <button class="btn-action" title="Excluir Card" onclick="deleteCustomCard(${item.id}, event)">✕</button>
+              </div>
+              <div id="menu-${item.id}" class="menu-destinos hidden">
+                ${opcoesDestino}
+              </div>
+              ${mediaBack}
+              <div class="es-text">${item.es}</div>
+            </div>
+          </div>
+        `;
 
-  navigate("dashboard");
+        card.addEventListener("click", () => {
+          const isFlipped = card.classList.toggle("flipped");
+          if (isFlipped) falarEspanhol(item.es, card, false);
+        });
 
-  const low=getLowStockProducts();
-  if(low.length){
-    setTimeout(()=>{
-      toast(`⚠️ ${numberPT(low.length)} artigo(s) com stock baixo. Verifique o que precisa de novo pedido.`,"warning");
-    },700);
-  }
+        fragment.appendChild(card);
+      });
 
-}
+      container.appendChild(fragment);
+    }
 
-init();
+    function switchCategory(cat) {
+      currentActiveTab = cat;
+      const tabBtns = document.querySelectorAll(".tab-btn");
+      const allKeys = Object.keys(catalogosPadrao).concat(categoriasCustomizadas);
 
-</script>
+      allKeys.forEach((c) => {
+        const grid = document.getElementById(`grid-${c}`);
+        if (grid) grid.classList.add("hidden");
+      });
 
+      const gridLixeira = document.getElementById('grid-lixeira');
+      if (gridLixeira) gridLixeira.classList.add("hidden");
+
+      tabBtns.forEach(btn => btn.classList.remove("active"));
+
+      if (cat === 'lixeira') {
+        if (gridLixeira) gridLixeira.classList.remove("hidden");
+        tabBtns.forEach(btn => {
+          if (btn.innerText.includes('🗑️')) btn.classList.add("active");
+        });
+        renderLixeira();
+      } else if (cat === 'custom') {
+        const customContainer = document.getElementById('container-custom');
+        customContainer.classList.remove("hidden");
+        tabBtns.forEach(btn => {
+          if (btn.innerText.includes('Personalizado')) btn.classList.add("active");
+        });
+        renderCustomGrid();
+      } else {
+        const customContainer = document.getElementById('container-custom');
+        customContainer.classList.add("hidden");
+        const grid = document.getElementById(`grid-${cat}`);
+        if (grid) grid.classList.remove("hidden");
+        allKeys.forEach((c, index) => {
+          if (c === cat && tabBtns[index]) {
+            tabBtns[index].classList.add("active");
+          }
+        });
+      }
+    }
+
+    function renderLixeira() {
+      const container = document.getElementById('grid-lixeira');
+      if (!container) return;
+      renderGridData(lixeira, 'grid-lixeira', 'lixeira');
+    }
+
+    function entrarNoApp() {
+      const splash = document.getElementById('splash-screen');
+      if (splash) {
+        splash.classList.add('splash-hide');
+        setTimeout(() => splash.remove(), 550);
+      }
+    }
+
+    renderApp();
+  </script>
 </body>
 </html>
