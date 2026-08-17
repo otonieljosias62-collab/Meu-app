@@ -1,2 +1,0 @@
-# Meu-app
-StokPT
